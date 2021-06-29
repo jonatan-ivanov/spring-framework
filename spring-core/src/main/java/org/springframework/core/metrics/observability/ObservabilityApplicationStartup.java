@@ -16,6 +16,8 @@
 
 package org.springframework.core.metrics.observability;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.springframework.core.metrics.ApplicationStartup;
 import org.springframework.core.metrics.StartupStep;
 import org.springframework.observability.tracing.Span;
@@ -32,14 +34,26 @@ public class ObservabilityApplicationStartup implements ApplicationStartup {
 
 	private final ThreadLocalSpan threadLocalSpan;
 
+	private final Span rootSpan;
+
+	private final AtomicBoolean started = new AtomicBoolean();
+
 	public ObservabilityApplicationStartup(Tracer tracer) {
 		this.threadLocalSpan = new ThreadLocalSpan(tracer);
+		this.rootSpan = this.threadLocalSpan.nextSpan().name("application-context");
 	}
 
 	@Override
 	public StartupStep start(String name) {
-		Span span = this.threadLocalSpan.nextSpan();
-		return new ObservabilityStartupStep(name, span);
+		if (!this.started.get()) {
+			this.started.set(true);
+			this.rootSpan.start();
+		}
+		return new ObservabilityStartupStep(name, this.threadLocalSpan);
+	}
+
+	public void endRootSpan() {
+		this.threadLocalSpan.end();
 	}
 
 }

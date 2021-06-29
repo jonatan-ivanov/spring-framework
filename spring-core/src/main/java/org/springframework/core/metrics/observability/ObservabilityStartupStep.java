@@ -21,6 +21,7 @@ import java.util.function.Supplier;
 
 import org.springframework.core.metrics.StartupStep;
 import org.springframework.observability.tracing.Span;
+import org.springframework.observability.tracing.ThreadLocalSpan;
 import org.springframework.observability.tracing.internal.EncodingUtils;
 import org.springframework.observability.tracing.internal.SpanNameUtil;
 
@@ -31,18 +32,42 @@ import org.springframework.observability.tracing.internal.SpanNameUtil;
  */
 class ObservabilityStartupStep implements StartupStep {
 
+	private final ThreadLocalSpan threadLocalSpan;
+
 	private final Span span;
 
 	private final String name;
 
 	public ObservabilityStartupStep(String name,
-			Span span) {
-		this.span = span.start().name(SpanNameUtil.toLowerHyphen(name(name))).event(name);
+			ThreadLocalSpan threadLocalSpan) {
+		this.threadLocalSpan = threadLocalSpan;
+		this.span = threadLocalSpan.nextSpan().start().name(SpanNameUtil.toLowerHyphen(nameFromEvent(name))).tag("event", name);
 		this.name = name;
 	}
 
+	private String nameFromEvent(String name) {
+		String[] split = name.split("\\.");
+		if (split.length > 1) {
+			return split[split.length - 2] + "-" + split[split.length -1];
+		}
+		return name;
+	}
+
 	private String name(String name) {
-		int index = name.lastIndexOf(".");
+		String afterDotOrDollar = afterDotOrDollar(name);
+		int index = afterDotOrDollar.lastIndexOf("@");
+		if (index != -1) {
+			return afterDotOrDollar.substring(0, index);
+		}
+		return afterDotOrDollar;
+	}
+
+	private String afterDotOrDollar(String name) {
+		int index = name.lastIndexOf("$");
+		if (index != -1) {
+			return name.substring(index + 1);
+		}
+		index = name.lastIndexOf(".");
 		if (index != -1) {
 			return name.substring(index + 1);
 		}
@@ -70,8 +95,8 @@ class ObservabilityStartupStep implements StartupStep {
 
 	@Override
 	public StartupStep tag(String key, String value) {
-		if (key.equals("beanName")) {
-			this.span.name(name(value));
+		if (key.equals("beanName") || key.equals("postProcessor")) {
+			this.span.name(SpanNameUtil.toLowerHyphen(name(value)));
 		}
 		this.span.tag(SpanNameUtil.toLowerHyphen(key), value);
 		return this;
@@ -90,6 +115,6 @@ class ObservabilityStartupStep implements StartupStep {
 
 	@Override
 	public void end() {
-		this.span.end();
+		this.threadLocalSpan.end();
 	}
 }
