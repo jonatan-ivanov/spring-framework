@@ -2,11 +2,6 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 description = "Spring Core"
 
-// [OBSERVABILITY]
-repositories {
-	mavenLocal()
-}
-
 apply plugin: "kotlin"
 
 // spring-core includes asm and repackages cglib, inlining both into the spring-core jar.
@@ -57,7 +52,7 @@ dependencies {
 	optional("io.netty:netty-buffer")
 
 	// [OBSERVABILITY]
-	compile("org.springframework:spring-observability-tracing-api:1.0.0-SNAPSHOT")
+	compile("org.springframework:spring-observability-tracing-api")
 
 	testCompile("io.projectreactor:reactor-test")
 	testCompile("com.google.code.findbugs:jsr305")

@@ -18,6 +18,7 @@ package org.springframework.core.metrics.observability;
 
 import org.springframework.core.metrics.ApplicationStartup;
 import org.springframework.core.metrics.StartupStep;
+import org.springframework.observability.tracing.Span;
 import org.springframework.observability.tracing.ThreadLocalSpan;
 import org.springframework.observability.tracing.Tracer;
 
@@ -37,8 +38,8 @@ public class ObservabilityApplicationStartup implements ApplicationStartup {
 
 	@Override
 	public StartupStep start(String name) {
-		// TODO: Is this done on a single thread?
-		return new ObservabilityStartupStep(name, this.threadLocalSpan.nextSpan());
+		Span span = this.threadLocalSpan.nextSpan();
+		return new ObservabilityStartupStep(name, span);
 	}
 
 }

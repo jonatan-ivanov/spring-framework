@@ -16,7 +16,11 @@
 
 package org.springframework.core.metrics.observability;
 
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.function.Supplier;
+
+import org.jetbrains.annotations.NotNull;
 
 import org.springframework.core.metrics.StartupStep;
 import org.springframework.observability.tracing.Span;
@@ -36,8 +40,16 @@ class ObservabilityStartupStep implements StartupStep {
 
 	public ObservabilityStartupStep(String name,
 			Span span) {
-		this.span = span.start().event(name);
+		this.span = span.start().name(SpanNameUtil.toLowerHyphen(name(name))).event(name);
 		this.name = name;
+	}
+
+	private String name(String name) {
+		int index = name.lastIndexOf(".");
+		if (index != -1) {
+			return name.substring(index + 1);
+		}
+		return name;
 	}
 
 	@Override
@@ -62,7 +74,7 @@ class ObservabilityStartupStep implements StartupStep {
 	@Override
 	public StartupStep tag(String key, String value) {
 		if (key.equals("beanName")) {
-			this.span.name(value);
+			this.span.name(name(value));
 		}
 		this.span.tag(SpanNameUtil.toLowerHyphen(key), value);
 		return this;
@@ -76,7 +88,7 @@ class ObservabilityStartupStep implements StartupStep {
 
 	@Override
 	public Tags getTags() {
-		throw new UnsupportedOperationException("You can't access the tags");
+		return Collections::emptyIterator;
 	}
 
 	@Override
