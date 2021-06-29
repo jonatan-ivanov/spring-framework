@@ -17,10 +17,7 @@
 package org.springframework.core.metrics.observability;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.function.Supplier;
-
-import org.jetbrains.annotations.NotNull;
 
 import org.springframework.core.metrics.StartupStep;
 import org.springframework.observability.tracing.Span;
