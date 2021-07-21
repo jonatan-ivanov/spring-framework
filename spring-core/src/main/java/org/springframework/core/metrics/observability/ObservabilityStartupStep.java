@@ -20,10 +20,11 @@ import java.util.Collections;
 import java.util.function.Supplier;
 
 import org.springframework.core.metrics.StartupStep;
-import org.springframework.observability.tracing.Span;
-import org.springframework.observability.tracing.ThreadLocalSpan;
-import org.springframework.observability.tracing.internal.EncodingUtils;
-import org.springframework.observability.tracing.internal.SpanNameUtil;
+import org.springframework.observability.event.Recorder;
+import org.springframework.observability.event.interval.IntervalEvent;
+import org.springframework.observability.event.interval.IntervalRecording;
+import org.springframework.observability.event.tag.Cardinality;
+import org.springframework.util.StringUtils;
 
 /**
  * {@link StartupStep} implementation for Spring Observability.
@@ -32,16 +33,23 @@ import org.springframework.observability.tracing.internal.SpanNameUtil;
  */
 class ObservabilityStartupStep implements StartupStep {
 
-	private final ThreadLocalSpan threadLocalSpan;
-
-	private final Span span;
+	private final IntervalRecording<?> intervalRecording;
 
 	private final String name;
 
-	public ObservabilityStartupStep(String name,
-			ThreadLocalSpan threadLocalSpan) {
-		this.threadLocalSpan = threadLocalSpan;
-		this.span = threadLocalSpan.nextSpan().start().name(SpanNameUtil.toLowerHyphen(nameFromEvent(name))).tag("event", name);
+	public ObservabilityStartupStep(String name, Recorder<?> recorder) {
+		this.intervalRecording = recorder.recordingFor(new IntervalEvent() {
+			@Override
+			public String getName() {
+				return nameFromEvent(name);
+			}
+
+			@Override
+			public String getDescription() {
+				return "Interval event over [" + name + "] startup event";
+			}
+		}).tag(org.springframework.observability.event.tag.Tag.of("event", name, Cardinality.HIGH))
+				.start();
 		this.name = name;
 	}
 
@@ -81,30 +89,26 @@ class ObservabilityStartupStep implements StartupStep {
 
 	@Override
 	public long getId() {
-		return EncodingUtils.longFromBase16String(this.span.context().spanId());
+		return 0L;
 	}
 
 	@Override
 	public Long getParentId() {
-		String parentId = this.span.context().parentId();
-		if (parentId == null) {
-			return null;
-		}
-		return EncodingUtils.longFromBase16String(parentId);
+		return 0L;
 	}
 
 	@Override
 	public StartupStep tag(String key, String value) {
 		if (key.equals("beanName") || key.equals("postProcessor")) {
-			this.span.name(SpanNameUtil.toLowerHyphen(name(value)));
+			this.intervalRecording.name(EventNameUtil.toLowerHyphen(name(value)));
 		}
-		this.span.tag(SpanNameUtil.toLowerHyphen(key), value);
+		this.intervalRecording.tag(org.springframework.observability.event.tag.Tag.of(EventNameUtil.toLowerHyphen(key), value, Cardinality.HIGH));
 		return this;
 	}
 
 	@Override
 	public StartupStep tag(String key, Supplier<String> value) {
-		this.span.tag(SpanNameUtil.toLowerHyphen(key), value.get());
+		this.intervalRecording.tag(org.springframework.observability.event.tag.Tag.of(EventNameUtil.toLowerHyphen(key), value.get(), Cardinality.HIGH));
 		return this;
 	}
 
@@ -115,6 +119,51 @@ class ObservabilityStartupStep implements StartupStep {
 
 	@Override
 	public void end() {
-		this.threadLocalSpan.end();
+		this.intervalRecording.stop();
+	}
+
+	static final class EventNameUtil {
+
+		static final int MAX_NAME_LENGTH = 50;
+
+		private EventNameUtil() {
+
+		}
+
+		/**
+		 * Shortens the name of a span.
+		 * @param name name to shorten
+		 * @return shortened name
+		 */
+		public static String shorten(String name) {
+			if (!StringUtils.hasText(name)) {
+				return name;
+			}
+			int maxLength = Math.min(name.length(), MAX_NAME_LENGTH);
+			return name.substring(0, maxLength);
+		}
+
+		/**
+		 * Converts the name to a lower hyphen version.
+		 * @param name name to change
+		 * @return changed name
+		 */
+		public static String toLowerHyphen(String name) {
+			StringBuilder result = new StringBuilder();
+			for (int i = 0; i < name.length(); i++) {
+				char c = name.charAt(i);
+				if (Character.isUpperCase(c)) {
+					if (i != 0) {
+						result.append('-');
+					}
+					result.append(Character.toLowerCase(c));
+				}
+				else {
+					result.append(c);
+				}
+			}
+			return EventNameUtil.shorten(result.toString());
+		}
+
 	}
 }

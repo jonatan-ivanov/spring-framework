@@ -20,9 +20,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.core.metrics.ApplicationStartup;
 import org.springframework.core.metrics.StartupStep;
-import org.springframework.observability.tracing.Span;
-import org.springframework.observability.tracing.ThreadLocalSpan;
-import org.springframework.observability.tracing.Tracer;
+import org.springframework.observability.event.Recorder;
+import org.springframework.observability.event.interval.IntervalEvent;
+import org.springframework.observability.event.interval.IntervalRecording;
 
 /**
  * {@link ApplicationStartup} implementation for the Spring Observability.
@@ -32,28 +32,38 @@ import org.springframework.observability.tracing.Tracer;
  */
 public class ObservabilityApplicationStartup implements ApplicationStartup {
 
-	private final ThreadLocalSpan threadLocalSpan;
+	private final Recorder<?> recorder;
 
-	private final Span rootSpan;
+	private final IntervalRecording<?> rootRecording;
 
 	private final AtomicBoolean started = new AtomicBoolean();
 
-	public ObservabilityApplicationStartup(Tracer tracer) {
-		this.threadLocalSpan = new ThreadLocalSpan(tracer);
-		this.rootSpan = this.threadLocalSpan.nextSpan().name("application-context");
+	public ObservabilityApplicationStartup(Recorder<?> recorder) {
+		this.recorder = recorder;
+		this.rootRecording = recorder.recordingFor(new IntervalEvent() {
+			@Override
+			public String getName() {
+				return "application-context";
+			}
+
+			@Override
+			public String getDescription() {
+				return "Root recording for application context instrumentation";
+			}
+		});
 	}
 
 	@Override
 	public StartupStep start(String name) {
 		if (!this.started.get()) {
 			this.started.set(true);
-			this.rootSpan.start();
+			this.rootRecording.start();
 		}
-		return new ObservabilityStartupStep(name, this.threadLocalSpan);
+		return new ObservabilityStartupStep(name, this.recorder);
 	}
 
-	public void endRootSpan() {
-		this.threadLocalSpan.end();
+	public void endRootRecording() {
+		this.rootRecording.stop();
 	}
 
 }
