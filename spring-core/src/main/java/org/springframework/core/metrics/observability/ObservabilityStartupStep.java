@@ -40,7 +40,7 @@ class ObservabilityStartupStep implements StartupStep {
 	public ObservabilityStartupStep(String name, Recorder<?> recorder) {
 		this.intervalRecording = recorder.recordingFor(new IntervalEvent() {
 			@Override
-			public String getName() {
+			public String getLowCardinalityName() {
 				return nameFromEvent(name);
 			}
 
@@ -100,7 +100,7 @@ class ObservabilityStartupStep implements StartupStep {
 	@Override
 	public StartupStep tag(String key, String value) {
 		if (key.equals("beanName") || key.equals("postProcessor")) {
-			this.intervalRecording.name(EventNameUtil.toLowerHyphen(name(value)));
+			this.intervalRecording.highCardinalityName(EventNameUtil.toLowerHyphen(name(value)));
 		}
 		this.intervalRecording.tag(org.springframework.observability.event.tag.Tag.of(EventNameUtil.toLowerHyphen(key), value, Cardinality.HIGH));
 		return this;

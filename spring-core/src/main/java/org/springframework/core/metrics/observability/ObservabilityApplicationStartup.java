@@ -42,7 +42,7 @@ public class ObservabilityApplicationStartup implements ApplicationStartup {
 		this.recorder = recorder;
 		this.rootRecording = recorder.recordingFor(new IntervalEvent() {
 			@Override
-			public String getName() {
+			public String getLowCardinalityName() {
 				return "application-context";
 			}
 
