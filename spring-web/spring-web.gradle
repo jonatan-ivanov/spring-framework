@@ -58,6 +58,10 @@ dependencies {
 	optional("org.jetbrains.kotlin:kotlin-reflect")
 	optional("org.jetbrains.kotlin:kotlin-stdlib")
 	optional("org.jetbrains.kotlinx:kotlinx-serialization-json")
+
+	// [OBSERVABILITY]
+	optional("org.springframework:spring-observability-api")
+
 	testCompile(testFixtures(project(":spring-beans")))
 	testCompile(testFixtures(project(":spring-context")))
 	testCompile(testFixtures(project(":spring-core")))

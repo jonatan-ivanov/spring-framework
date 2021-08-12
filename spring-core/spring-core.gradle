@@ -52,7 +52,7 @@ dependencies {
 	optional("io.netty:netty-buffer")
 
 	// [OBSERVABILITY]
-	compile("org.springframework:spring-observability-api")
+	optional("org.springframework:spring-observability-api")
 
 	testCompile("io.projectreactor:reactor-test")
 	testCompile("com.google.code.findbugs:jsr305")
