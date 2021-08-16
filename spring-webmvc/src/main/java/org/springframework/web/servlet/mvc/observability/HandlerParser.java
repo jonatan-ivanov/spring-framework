@@ -36,6 +36,12 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class HandlerParser {
 
+	/*
+	 * Intentionally public for @Autowired to work without explicit binding
+	 */
+	public HandlerParser() {
+	}
+
 	/** Adds no tags to the span representing the request. */
 	public static final HandlerParser NOOP = new HandlerParser() {
 		@Override
@@ -79,12 +85,6 @@ public class HandlerParser {
 	 */
 	protected void postHandle(HttpServletRequest request, Object handler, ModelAndView modelAndView,
 			IntervalRecording<?> customizer) {
-	}
-
-	/*
-	 * Intentionally public for @Autowired to work without explicit binding
-	 */
-	public HandlerParser() {
 	}
 
 }

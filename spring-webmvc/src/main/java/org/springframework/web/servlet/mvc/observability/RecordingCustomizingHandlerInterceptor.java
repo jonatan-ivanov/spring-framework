@@ -19,7 +19,6 @@ package org.springframework.web.servlet.mvc.observability;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.observability.event.interval.IntervalRecording;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -33,13 +32,12 @@ import org.springframework.web.servlet.ModelAndView;
  *
  * @since 1.0.0
  */
-public final class RecordingCustomizingHandlerInterceptor implements HandlerInterceptor {
+public class RecordingCustomizingHandlerInterceptor implements HandlerInterceptor {
 
-	@Autowired(required = false)
-	HandlerParser handlerParser = new HandlerParser();
+	private final HandlerParser handlerParser;
 
-	RecordingCustomizingHandlerInterceptor() { // hide the ctor so we can change later if
-											// needed
+	public RecordingCustomizingHandlerInterceptor(HandlerParser handlerParser) {
+		this.handlerParser = handlerParser;
 	}
 
 	/**
@@ -87,6 +85,7 @@ public final class RecordingCustomizingHandlerInterceptor implements HandlerInte
 	 */
 	static void setHttpRouteAttribute(HttpServletRequest request) {
 		Object httpRoute = request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
+		// TODO: Push to a constant
 		request.setAttribute("http.route", httpRoute != null ? httpRoute.toString() : "");
 	}
 

@@ -17,23 +17,17 @@
 package org.springframework.web.servlet.mvc.observability;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
 
 import javax.servlet.FilterChain;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jetbrains.annotations.NotNull;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.lang.Nullable;
-import org.springframework.observability.core.http.HttpServerRequest;
-import org.springframework.observability.core.http.HttpServerResponse;
 import org.springframework.observability.event.Recorder;
 import org.springframework.observability.event.interval.IntervalHttpServerEvent;
 import org.springframework.observability.event.interval.IntervalRecording;
@@ -110,7 +104,20 @@ public class WebMvcObservabilityFilter extends OncePerRequestFilter {
 	}
 
 	private TimingContext startAndAttachTimingContext(HttpServletRequest request) {
-		IntervalRecording<?> recording = this.recorder.recordingFor(new IntervalHttpServerEvent(new HttpServletRequestWrapper(request)) {
+		IntervalRecording<?> recording = this.recorder.recordingFor(event(request)).start();
+		TimingContext timingContext = new TimingContext(recording);
+		timingContext.attachTo(request);
+		return timingContext;
+	}
+
+	/**
+	 * TODO: Can be overridden to support long task timing
+	 * @param request request
+	 * @return HTTP server event
+	 */
+	@NotNull
+	public IntervalHttpServerEvent event(HttpServletRequest request) {
+		return new IntervalHttpServerEvent(new HttpServletRequestWrapper(request)) {
 			@Override
 			public String getLowCardinalityName() {
 				return metricName;
@@ -120,10 +127,7 @@ public class WebMvcObservabilityFilter extends OncePerRequestFilter {
 			public String getDescription() {
 				return "HTTP server recording";
 			}
-		}).start();
-		TimingContext timingContext = new TimingContext(recording);
-		timingContext.attachTo(request);
-		return timingContext;
+		};
 	}
 
 	private Throwable fetchException(HttpServletRequest request) {
@@ -187,164 +191,4 @@ public class WebMvcObservabilityFilter extends OncePerRequestFilter {
 
 	}
 
-	private static class HttpServletRequestWrapper implements HttpServerRequest {
-
-		private final HttpServletRequest delegate;
-
-		private HttpServletRequestWrapper(HttpServletRequest delegate) {
-			this.delegate = delegate;
-		}
-
-		@Override
-		public Object getAttribute(String key) {
-			return this.delegate.getAttribute(key);
-		}
-
-		@Override
-		public void setAttribute(String key, Object value) {
-			this.delegate.setAttribute(key, value);
-		}
-
-		@Override
-		public Collection<String> headerNames() {
-			return Collections.list(this.delegate.getHeaderNames());
-		}
-
-		@Override
-		public Object unwrap() {
-			return delegate;
-		}
-
-		@Override
-		public String method() {
-			return delegate.getMethod();
-		}
-
-		@Override
-		public String route() {
-			Object maybeRoute = delegate.getAttribute("http.route");
-			return maybeRoute instanceof String ? (String) maybeRoute : null;
-		}
-
-		@Override
-		public String path() {
-			return delegate.getRequestURI();
-		}
-
-		// not as some implementations may be able to do this more efficiently
-		@Override
-		public String url() {
-			StringBuffer url = delegate.getRequestURL();
-			if (delegate.getQueryString() != null && !delegate.getQueryString().isEmpty()) {
-				url.append('?').append(delegate.getQueryString());
-			}
-			return url.toString();
-		}
-
-		@Override
-		public String header(String name) {
-			return delegate.getHeader(name);
-		}
-
-		/** Looks for a valid request attribute "error". */
-		@Nullable
-		Throwable maybeError() {
-			Object maybeError = delegate.getAttribute("error");
-			if (maybeError instanceof Throwable) {
-				return (Throwable) maybeError;
-			}
-			maybeError = delegate.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
-			if (maybeError instanceof Throwable) {
-				return (Throwable) maybeError;
-			}
-			return null;
-		}
-
-		@Override
-		public String remoteIp() {
-			return this.delegate.getRemoteAddr();
-		}
-
-		@Override
-		public int remotePort() {
-			return this.delegate.getRemotePort();
-		}
-	}
-
-	private static class HttpServletResponseWrapper implements HttpServerResponse {
-
-		// not final for inner
-		// subtype
-		/**
-		 * Returns the trace representation of a response.
-		 * @param caught an exception caught serving the request.
-		 * @return wrapped response
-		 */
-		public static HttpServerResponse create(@Nullable HttpServletRequest request, HttpServletResponse response,
-				@Nullable Throwable caught) {
-			return new HttpServletResponseWrapper(request, response, caught);
-		}
-
-		@Nullable
-		final HttpServletRequestWrapper request;
-
-		final HttpServletResponse response;
-
-		@Nullable
-		final Throwable caught;
-
-		HttpServletResponseWrapper(@Nullable HttpServletRequest request, HttpServletResponse response,
-				@Nullable Throwable caught) {
-			if (response == null) {
-				throw new NullPointerException("response == null");
-			}
-			this.request = request != null ? new HttpServletRequestWrapper(request) : null;
-			this.response = response;
-			this.caught = caught;
-		}
-
-		@Override
-		public final Object unwrap() {
-			return response;
-		}
-
-		@Override
-		public Collection<String> headerNames() {
-			return this.response.getHeaderNames();
-		}
-
-		@Override
-		@Nullable
-		public HttpServletRequestWrapper request() {
-			return request;
-		}
-
-		@Override
-		public Throwable error() {
-			if (caught != null) {
-				return caught;
-			}
-			if (request == null) {
-				return null;
-			}
-			return request.maybeError();
-		}
-
-		@Override
-		public int statusCode() {
-			int result = this.response.getStatus();
-			if (caught != null && result == 200) { // We may have a potentially bad status due
-				// to defaults
-				// Servlet only seems to define one exception that has a built-in code. Logic
-				// in Jetty
-				// defaults the status to 500 otherwise.
-				if (caught instanceof UnavailableException) {
-					return ((UnavailableException) caught).isPermanent() ? 404 : 503;
-				}
-				return 500;
-			}
-			return result;
-		}
-
-	}
 }

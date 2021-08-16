@@ -19,7 +19,6 @@ package org.springframework.web.servlet.mvc.observability;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.observability.event.interval.IntervalRecording;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -31,11 +30,10 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public final class RecordingCustomizingAsyncHandlerInterceptor implements AsyncHandlerInterceptor, HandlerInterceptor {
 
-	@Autowired(required = false)
-	HandlerParser handlerParser = new HandlerParser();
+	private final HandlerParser handlerParser;
 
-	RecordingCustomizingAsyncHandlerInterceptor() { // hide the ctor so we can change later if
-												// needed
+	public RecordingCustomizingAsyncHandlerInterceptor(HandlerParser handlerParser) {
+		this.handlerParser = handlerParser;
 	}
 
 	@Override
