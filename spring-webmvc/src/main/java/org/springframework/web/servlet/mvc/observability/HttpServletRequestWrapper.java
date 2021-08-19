@@ -9,6 +9,12 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.lang.Nullable;
 import org.springframework.core.observability.transport.http.HttpServerRequest;
 
+/**
+ * Wrapper around the {@link HttpServletRequest}.
+ *
+ * @author Marcin Grzejszczak
+ * @since 6.0.0
+ */
 public class HttpServletRequestWrapper implements HttpServerRequest {
 
 	private final HttpServletRequest delegate;

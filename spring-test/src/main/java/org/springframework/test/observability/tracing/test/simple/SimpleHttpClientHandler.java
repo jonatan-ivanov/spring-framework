@@ -38,6 +38,8 @@ public class SimpleHttpClientHandler implements HttpClientHandler {
 	public boolean receiveHandled;
 
 	/**
+	 * Creates a new instance.
+	 *
 	 * @param simpleTracer simple tracer
 	 */
 	public SimpleHttpClientHandler(SimpleTracer simpleTracer) {

@@ -193,6 +193,8 @@ public class SimpleSpan implements Span {
 	}
 
 	/**
+	 * Returns a list of event names.
+	 *
 	 * @return list of event names
 	 */
 	public List<String> eventNames() {
@@ -224,6 +226,8 @@ public class SimpleSpan implements Span {
 		public final long timestamp;
 
 		/**
+		 * Creates a new instance.
+		 *
 		 * @param name event name
 		 * @param timestamp event timestamp
 		 */

@@ -58,10 +58,10 @@ public class WebMvcObservabilityFilter extends OncePerRequestFilter {
 
 	/**
 	 * Create a new {@link WebMvcObservabilityFilter} instance.
+	 *
 	 * @param recorder the meter recorder
 	 * @param tagsProvider the tags provider
 	 * @param metricName the metric name
-	 * @since 2.2.0
 	 */
 	public WebMvcObservabilityFilter(Recorder<?> recorder, WebMvcTagsProvider tagsProvider, String metricName) {
 		this.recorder = recorder;
@@ -113,7 +113,7 @@ public class WebMvcObservabilityFilter extends OncePerRequestFilter {
 	/**
 	 * TODO: Can be overridden to support long task timing
 	 * @param request request
-	 * @return HTTP server event
+	 * @return a HTTP server event
 	 */
 	@NotNull
 	public IntervalHttpServerEvent event(HttpServletRequest request) {

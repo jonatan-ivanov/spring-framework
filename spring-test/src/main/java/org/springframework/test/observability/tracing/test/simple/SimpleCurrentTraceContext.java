@@ -37,6 +37,8 @@ public class SimpleCurrentTraceContext implements CurrentTraceContext {
 	public TraceContext traceContext;
 
 	/**
+	 * Creates a new instance.
+	 *
 	 * @param simpleTracer simple tracer
 	 * @return simple current trace context with the current context
 	 */

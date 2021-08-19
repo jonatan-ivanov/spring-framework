@@ -37,6 +37,8 @@ public class SimpleHttpServerHandler implements HttpServerHandler {
 	public boolean receiveHandled;
 
 	/**
+	 * Creates a new instance.
+	 *
 	 * @param simpleTracer simple tracer
 	 */
 	public SimpleHttpServerHandler(SimpleTracer simpleTracer) {

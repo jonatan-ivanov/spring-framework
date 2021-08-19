@@ -45,7 +45,7 @@ public class SimpleTracer implements Tracer {
 	public Deque<SimpleSpan> spans = new LinkedList<>();
 
 	/**
-	 * Default constructor.
+	 * Creates a new instance.
 	 */
 	public SimpleTracer() {
 		this.currentTraceContext = SimpleCurrentTraceContext.withTracer(this);
@@ -57,6 +57,8 @@ public class SimpleTracer implements Tracer {
 	}
 
 	/**
+	 * Returns the only span.
+	 *
 	 * @return a single reported span
 	 */
 	public SimpleSpan getOnlySpan() {
@@ -74,6 +76,8 @@ public class SimpleTracer implements Tracer {
 	}
 
 	/**
+	 * Returns the last span.
+	 *
 	 * @return the last reported span
 	 */
 	public SimpleSpan getLastSpan() {

@@ -27,16 +27,22 @@ import java.io.Closeable;
 public interface TestTracingAware extends Closeable {
 
 	/**
+	 * Returns the {@link TracerAware}.
+	 *
 	 * @return a {@link TracerAware}
 	 */
 	TracerAware tracing();
 
 	/**
+	 * Returns a {@link TestSpanHandler}.
+	 *
 	 * @return a {@link TestSpanHandler}
 	 */
 	TestSpanHandler handler();
 
 	/**
+	 * Returns the {@link TestTracingAssertions}.
+	 *
 	 * @return a {@link TestTracingAssertions}
 	 */
 	TestTracingAssertions assertions();

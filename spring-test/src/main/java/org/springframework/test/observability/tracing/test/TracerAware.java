@@ -32,40 +32,52 @@ import org.springframework.core.observability.tracing.propagation.Propagator;
 public interface TracerAware {
 
 	/**
+	 * Returns a {@link Tracer}.
+	 *
 	 * @return a {@link Tracer}
 	 */
 	Tracer tracer();
 
 	/**
 	 * Sets a tracing sampler.
+	 *
 	 * @param sampler tracing sampler
 	 * @return this
 	 */
 	TracerAware sampler(TraceSampler sampler);
 
 	/**
+	 * Returns the {@link CurrentTraceContext}.
+	 *
 	 * @return a {@link CurrentTraceContext}
 	 */
 	CurrentTraceContext currentTraceContext();
 
 	/**
+	 * Returns the {@link Propagator}.
+	 *
 	 * @return a {@link Propagator}
 	 */
 	Propagator propagator();
 
 	/**
+	 * Returns the {@link HttpServerHandler}.
+	 *
 	 * @return a {@link HttpServerHandler}
 	 */
 	HttpServerHandler httpServerHandler();
 
 	/**
 	 * Sets a http request parser.
+	 *
 	 * @param httpRequestParser a {@link HttpRequestParser}
 	 * @return this
 	 */
 	TracerAware clientRequestParser(HttpRequestParser httpRequestParser);
 
 	/**
+	 * Returns the {@link HttpClientHandler}.
+	 *
 	 * @return a {@link HttpClientHandler}
 	 */
 	HttpClientHandler httpClientHandler();

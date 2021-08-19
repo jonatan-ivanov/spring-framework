@@ -78,6 +78,8 @@ public class SimpleSpanBuilder implements Span.Builder {
 	public SimpleTracer simpleTracer;
 
 	/**
+	 * Creates a new instance.
+	 *
 	 * @param simpleTracer simple tracer
 	 */
 	public SimpleSpanBuilder(SimpleTracer simpleTracer) {

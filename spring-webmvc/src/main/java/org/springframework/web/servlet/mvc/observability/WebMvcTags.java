@@ -35,7 +35,7 @@ import org.springframework.web.util.pattern.PathPattern;
  * @author Andy Wilkinson
  * @author Brian Clozel
  * @author Michael McFadyen
- * @since 2.0.0
+ * @since 6.0.0
  */
 public final class WebMvcTags {
 

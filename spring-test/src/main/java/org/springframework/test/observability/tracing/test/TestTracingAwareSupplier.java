@@ -16,8 +16,6 @@
 
 package org.springframework.test.observability.tracing.test;
 
-import org.junit.jupiter.api.AfterEach;
-
 /**
  * A single point of entry to all test tracing abstractions. Provides a JUnit clean up
  * method.
@@ -28,14 +26,15 @@ import org.junit.jupiter.api.AfterEach;
 public interface TestTracingAwareSupplier {
 
 	/**
+	 * Returns the {@link TestTracingAware}.
+	 *
 	 * @return a {@link TestTracingAware}
 	 */
 	TestTracingAware tracerTest();
 
 	/**
-	 * Cleans up tracing after tests.
+	 * Cleans up tracing. Can be used after each test.
 	 */
-	@AfterEach
 	default void cleanUpTracing() {
 		tracerTest().close();
 	}

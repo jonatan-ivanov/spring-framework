@@ -31,8 +31,9 @@ public interface TracingNewSpanParser {
 
 	/**
 	 * Override to control the name and tags on an annotation-based span.
+	 *
 	 * @param methodInvocation method invocation annotated with new span
-	 * @param newSpan meta data of the new span
+	 * @param newSpan metadata of the new span
 	 * @param span span to customize
 	 */
 	void parse(MethodInvocation methodInvocation, NewSpan newSpan, Span span);

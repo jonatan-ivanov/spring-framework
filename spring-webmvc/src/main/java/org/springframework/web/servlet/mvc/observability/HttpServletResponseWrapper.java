@@ -9,6 +9,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.lang.Nullable;
 import org.springframework.core.observability.transport.http.HttpServerResponse;
 
+/**
+ * Wrapper around the {@link HttpServletResponse}.
+ *
+ * @author Marcin Grzejszczak
+ * @since 6.0.0
+ */
 public class HttpServletResponseWrapper implements HttpServerResponse {
 
 	@Nullable

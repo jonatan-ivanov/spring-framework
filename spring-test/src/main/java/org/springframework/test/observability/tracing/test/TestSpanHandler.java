@@ -30,11 +30,15 @@ import org.springframework.core.observability.tracing.exporter.FinishedSpan;
 public interface TestSpanHandler extends Iterable<FinishedSpan> {
 
 	/**
+	 * Returns finished spans.
+	 *
 	 * @return a list of {@link FinishedSpan}s
 	 */
 	List<FinishedSpan> reportedSpans();
 
 	/**
+	 * Returns first local span.
+	 *
 	 * @return a first local finished span
 	 */
 	FinishedSpan takeLocalSpan();
@@ -45,18 +49,24 @@ public interface TestSpanHandler extends Iterable<FinishedSpan> {
 	void clear();
 
 	/**
+	 * Returns the first remote span of a given kind.
+	 *
 	 * @param kind kind of a span to take
 	 * @return picks the first remote span of a given kind
 	 */
 	FinishedSpan takeRemoteSpan(Span.Kind kind);
 
 	/**
+	 * Returns the first remote span of a given kind with error.
+	 *
 	 * @param kind kind of a span to take
 	 * @return picks the first remote span of a given kind with an error
 	 */
 	FinishedSpan takeRemoteSpanWithError(Span.Kind kind);
 
 	/**
+	 * Returns the finished span with index.
+	 *
 	 * @param index index of the finished span
 	 * @return a {@link FinishedSpan} with a given index
 	 */

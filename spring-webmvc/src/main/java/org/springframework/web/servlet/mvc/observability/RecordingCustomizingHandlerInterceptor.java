@@ -19,8 +19,8 @@ package org.springframework.web.servlet.mvc.observability;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.core.observability.event.interval.IntervalRecording;
 import org.springframework.lang.Nullable;
-import IntervalRecording;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -30,7 +30,8 @@ import org.springframework.web.servlet.ModelAndView;
  * also sets the request property "http.route" so that it can be used in naming the http
  * span.
  *
- * @since 1.0.0
+ * @author Marcin Grzejszczak
+ * @since 6.0.0
  */
 public class RecordingCustomizingHandlerInterceptor implements HandlerInterceptor {
 
@@ -71,18 +72,12 @@ public class RecordingCustomizingHandlerInterceptor implements HandlerIntercepto
 		}
 	}
 
-	/**
-	 * Sets the "error" attribute if not already set.
-	 */
 	static void setErrorAttribute(HttpServletRequest request, @Nullable Exception ex) {
 		if (ex != null && request.getAttribute("error") == null) {
 			request.setAttribute("error", ex);
 		}
 	}
 
-	/**
-	 * Sets the "http.route" attribute.
-	 */
 	static void setHttpRouteAttribute(HttpServletRequest request) {
 		Object httpRoute = request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
 		// TODO: Push to a constant

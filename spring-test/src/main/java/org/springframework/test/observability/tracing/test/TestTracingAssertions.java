@@ -28,6 +28,7 @@ public interface TestTracingAssertions {
 
 	/**
 	 * Assert that the {@link FinishedSpan} has no parent.
+	 *
 	 * @param finishedSpan finished span to assert
 	 */
 	void assertThatNoParentPresent(FinishedSpan finishedSpan);

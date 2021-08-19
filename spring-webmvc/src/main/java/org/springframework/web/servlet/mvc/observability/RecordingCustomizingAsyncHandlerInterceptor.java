@@ -19,7 +19,7 @@ package org.springframework.web.servlet.mvc.observability;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import IntervalRecording;
+import org.springframework.core.observability.event.interval.IntervalRecording;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -27,6 +27,9 @@ import org.springframework.web.servlet.ModelAndView;
 /**
  * Same as {@link RecordingCustomizingHandlerInterceptor} except it can be used as both an
  * {@link AsyncHandlerInterceptor} or a normal {@link HandlerInterceptor}.
+ *
+ * @author Marcin Grzejszczak
+ * @since 6.0.0
  */
 public final class RecordingCustomizingAsyncHandlerInterceptor implements AsyncHandlerInterceptor, HandlerInterceptor {
 
@@ -54,9 +57,6 @@ public final class RecordingCustomizingAsyncHandlerInterceptor implements AsyncH
 		}
 	}
 
-	/**
-	 * Sets the "error" and "http.route" attributes.
-	 */
 	@Override
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
 			Exception ex) {

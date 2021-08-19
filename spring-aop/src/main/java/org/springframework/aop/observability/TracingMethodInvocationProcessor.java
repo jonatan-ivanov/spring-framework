@@ -31,6 +31,7 @@ public interface TracingMethodInvocationProcessor {
 
 	/**
 	 * Executes a given Sleuth annotated method.
+	 *
 	 * @param invocation method invocation
 	 * @param newSpan annotation
 	 * @param continueSpan annotation
