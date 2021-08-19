@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.observability.core.http.HttpClientResponse;
-import org.springframework.observability.core.http.HttpRequest;
-import org.springframework.observability.event.tag.Cardinality;
-import org.springframework.observability.event.tag.Tag;
+import org.springframework.core.observability.transport.http.HttpClientResponse;
+import org.springframework.core.observability.transport.http.HttpRequest;
+import org.springframework.core.observability.event.tag.Cardinality;
+import org.springframework.core.observability.event.tag.Tag;
 
 public class DefaultObservabilityClientHttpRequestInterceptorTagsProvider implements ObservabilityClientHttpRequestInterceptorTagsProvider {
 

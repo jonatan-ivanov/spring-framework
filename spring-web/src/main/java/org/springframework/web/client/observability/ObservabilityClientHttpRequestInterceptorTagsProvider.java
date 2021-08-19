@@ -1,8 +1,8 @@
 package org.springframework.web.client.observability;
 
-import org.springframework.observability.core.http.HttpClientResponse;
-import org.springframework.observability.core.http.HttpRequest;
-import org.springframework.observability.event.tag.Tag;
+import org.springframework.core.observability.transport.http.HttpClientResponse;
+import org.springframework.core.observability.transport.http.HttpRequest;
+import org.springframework.core.observability.event.tag.Tag;
 
 @FunctionalInterface
 public interface ObservabilityClientHttpRequestInterceptorTagsProvider {

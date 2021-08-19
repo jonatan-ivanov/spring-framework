@@ -38,9 +38,6 @@ dependencies {
 	optional("org.reactivestreams:reactive-streams")
 	optional("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
-	// [OBSERVABILITY]
-	optional("org.springframework:spring-observability-api")
-
 	testCompile(project(":kotlin-coroutines"))
 	testCompile(testFixtures(project(":spring-beans")))
 	testCompile(testFixtures(project(":spring-core")))

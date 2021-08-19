@@ -19,7 +19,7 @@ package org.springframework.web.servlet.mvc.observability;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.observability.event.interval.IntervalRecording;
+import IntervalRecording;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -40,7 +40,7 @@ public final class RecordingCustomizingAsyncHandlerInterceptor implements AsyncH
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) {
 		Object recording = request.getAttribute(IntervalRecording.class.getName());
 		if (recording instanceof IntervalRecording) {
-			handlerParser.preHandle(request, o, (IntervalRecording<?>) recording);
+			this.handlerParser.preHandle(request, o, (IntervalRecording<?>) recording);
 		}
 		return true;
 	}
@@ -50,7 +50,7 @@ public final class RecordingCustomizingAsyncHandlerInterceptor implements AsyncH
 			ModelAndView modelAndView) {
 		Object recording = request.getAttribute(IntervalRecording.class.getName());
 		if (recording instanceof IntervalRecording) {
-			handlerParser.postHandle(request, handler, modelAndView, (IntervalRecording<?>) recording);
+			this.handlerParser.postHandle(request, handler, modelAndView, (IntervalRecording<?>) recording);
 		}
 	}
 

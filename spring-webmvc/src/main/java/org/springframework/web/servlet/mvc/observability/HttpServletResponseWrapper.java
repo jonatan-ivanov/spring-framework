@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.lang.Nullable;
-import org.springframework.observability.core.http.HttpServerResponse;
+import org.springframework.core.observability.transport.http.HttpServerResponse;
 
 public class HttpServletResponseWrapper implements HttpServerResponse {
 
@@ -31,7 +31,7 @@ public class HttpServletResponseWrapper implements HttpServerResponse {
 
 	@Override
 	public final Object unwrap() {
-		return response;
+		return this.response;
 	}
 
 	@Override
@@ -42,30 +42,30 @@ public class HttpServletResponseWrapper implements HttpServerResponse {
 	@Override
 	@Nullable
 	public HttpServletRequestWrapper request() {
-		return request;
+		return this.request;
 	}
 
 	@Override
 	public Throwable error() {
-		if (caught != null) {
-			return caught;
+		if (this.caught != null) {
+			return this.caught;
 		}
-		if (request == null) {
+		if (this.request == null) {
 			return null;
 		}
-		return request.maybeError();
+		return this.request.maybeError();
 	}
 
 	@Override
 	public int statusCode() {
 		int result = this.response.getStatus();
-		if (caught != null && result == 200) { // We may have a potentially bad status due
+		if (this.caught != null && result == 200) { // We may have a potentially bad status due
 			// to defaults
 			// Servlet only seems to define one exception that has a built-in code. Logic
 			// in Jetty
 			// defaults the status to 500 otherwise.
-			if (caught instanceof UnavailableException) {
-				return ((UnavailableException) caught).isPermanent() ? 404 : 503;
+			if (this.caught instanceof UnavailableException) {
+				return ((UnavailableException) this.caught).isPermanent() ? 404 : 503;
 			}
 			return 500;
 		}

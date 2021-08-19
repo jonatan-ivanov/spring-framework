@@ -20,10 +20,10 @@ import java.util.Collections;
 import java.util.function.Supplier;
 
 import org.springframework.core.metrics.StartupStep;
-import org.springframework.observability.event.Recorder;
-import org.springframework.observability.event.interval.IntervalEvent;
-import org.springframework.observability.event.interval.IntervalRecording;
-import org.springframework.observability.event.tag.Cardinality;
+import org.springframework.core.observability.event.Recorder;
+import org.springframework.core.observability.event.interval.IntervalEvent;
+import org.springframework.core.observability.event.interval.IntervalRecording;
+import org.springframework.core.observability.event.tag.Cardinality;
 import org.springframework.util.StringUtils;
 
 /**
@@ -48,7 +48,7 @@ class ObservabilityStartupStep implements StartupStep {
 			public String getDescription() {
 				return "Interval event over [" + name + "] startup event";
 			}
-		}).tag(org.springframework.observability.event.tag.Tag.of("event", name, Cardinality.HIGH))
+		}).tag(org.springframework.core.observability.event.tag.Tag.of("event", name, Cardinality.HIGH))
 				.start();
 		this.name = name;
 	}
@@ -102,13 +102,13 @@ class ObservabilityStartupStep implements StartupStep {
 		if (key.equals("beanName") || key.equals("postProcessor")) {
 			this.intervalRecording.highCardinalityName(EventNameUtil.toLowerHyphen(name(value)));
 		}
-		this.intervalRecording.tag(org.springframework.observability.event.tag.Tag.of(EventNameUtil.toLowerHyphen(key), value, Cardinality.HIGH));
+		this.intervalRecording.tag(org.springframework.core.observability.event.tag.Tag.of(EventNameUtil.toLowerHyphen(key), value, Cardinality.HIGH));
 		return this;
 	}
 
 	@Override
 	public StartupStep tag(String key, Supplier<String> value) {
-		this.intervalRecording.tag(org.springframework.observability.event.tag.Tag.of(EventNameUtil.toLowerHyphen(key), value.get(), Cardinality.HIGH));
+		this.intervalRecording.tag(org.springframework.core.observability.event.tag.Tag.of(EventNameUtil.toLowerHyphen(key), value.get(), Cardinality.HIGH));
 		return this;
 	}
 

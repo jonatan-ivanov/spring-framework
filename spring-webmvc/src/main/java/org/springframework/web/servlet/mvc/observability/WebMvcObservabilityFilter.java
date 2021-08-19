@@ -27,10 +27,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
 
+import org.springframework.core.observability.event.Recorder;
+import org.springframework.core.observability.event.interval.IntervalHttpServerEvent;
+import org.springframework.core.observability.event.interval.IntervalRecording;
 import org.springframework.http.HttpStatus;
-import org.springframework.observability.event.Recorder;
-import org.springframework.observability.event.interval.IntervalHttpServerEvent;
-import org.springframework.observability.event.interval.IntervalRecording;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.HandlerMapping;
@@ -120,7 +120,7 @@ public class WebMvcObservabilityFilter extends OncePerRequestFilter {
 		return new IntervalHttpServerEvent(new HttpServletRequestWrapper(request)) {
 			@Override
 			public String getLowCardinalityName() {
-				return metricName;
+				return WebMvcObservabilityFilter.this.metricName;
 			}
 
 			@Override

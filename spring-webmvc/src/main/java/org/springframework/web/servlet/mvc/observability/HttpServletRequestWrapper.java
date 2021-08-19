@@ -7,7 +7,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.lang.Nullable;
-import org.springframework.observability.core.http.HttpServerRequest;
+import org.springframework.core.observability.transport.http.HttpServerRequest;
 
 public class HttpServletRequestWrapper implements HttpServerRequest {
 
@@ -34,48 +34,48 @@ public class HttpServletRequestWrapper implements HttpServerRequest {
 
 	@Override
 	public Object unwrap() {
-		return delegate;
+		return this.delegate;
 	}
 
 	@Override
 	public String method() {
-		return delegate.getMethod();
+		return this.delegate.getMethod();
 	}
 
 	@Override
 	public String route() {
-		Object maybeRoute = delegate.getAttribute("http.route");
+		Object maybeRoute = this.delegate.getAttribute("http.route");
 		return maybeRoute instanceof String ? (String) maybeRoute : null;
 	}
 
 	@Override
 	public String path() {
-		return delegate.getRequestURI();
+		return this.delegate.getRequestURI();
 	}
 
 	// not as some implementations may be able to do this more efficiently
 	@Override
 	public String url() {
-		StringBuffer url = delegate.getRequestURL();
-		if (delegate.getQueryString() != null && !delegate.getQueryString().isEmpty()) {
-			url.append('?').append(delegate.getQueryString());
+		StringBuffer url = this.delegate.getRequestURL();
+		if (this.delegate.getQueryString() != null && !this.delegate.getQueryString().isEmpty()) {
+			url.append('?').append(this.delegate.getQueryString());
 		}
 		return url.toString();
 	}
 
 	@Override
 	public String header(String name) {
-		return delegate.getHeader(name);
+		return this.delegate.getHeader(name);
 	}
 
 	/** Looks for a valid request attribute "error". */
 	@Nullable
 	Throwable maybeError() {
-		Object maybeError = delegate.getAttribute("error");
+		Object maybeError = this.delegate.getAttribute("error");
 		if (maybeError instanceof Throwable) {
 			return (Throwable) maybeError;
 		}
-		maybeError = delegate.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+		maybeError = this.delegate.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 		if (maybeError instanceof Throwable) {
 			return (Throwable) maybeError;
 		}

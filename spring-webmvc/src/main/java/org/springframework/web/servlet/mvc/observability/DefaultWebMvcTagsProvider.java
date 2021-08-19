@@ -21,9 +21,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.observability.core.http.HttpServerRequest;
-import org.springframework.observability.core.http.HttpServerResponse;
-import org.springframework.observability.event.tag.Tag;
+import org.springframework.core.observability.transport.http.HttpServerRequest;
+import org.springframework.core.observability.transport.http.HttpServerResponse;
+import org.springframework.core.observability.event.tag.Tag;
 
 /**
  * Default implementation of {@link WebMvcTagsProvider}.

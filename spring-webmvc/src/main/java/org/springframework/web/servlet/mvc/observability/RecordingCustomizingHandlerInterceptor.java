@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.lang.Nullable;
-import org.springframework.observability.event.interval.IntervalRecording;
+import IntervalRecording;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -48,7 +48,7 @@ public class RecordingCustomizingHandlerInterceptor implements HandlerIntercepto
 		Object recording = request.getAttribute(IntervalRecording.class.getName());
 		if (recording instanceof IntervalRecording) {
 			setHttpRouteAttribute(request);
-			handlerParser.preHandle(request, o, (IntervalRecording<?>) recording);
+			this.handlerParser.preHandle(request, o, (IntervalRecording<?>) recording);
 		}
 		return true;
 	}
@@ -58,7 +58,7 @@ public class RecordingCustomizingHandlerInterceptor implements HandlerIntercepto
 			ModelAndView modelAndView) {
 		Object recording = request.getAttribute(IntervalRecording.class.getName());
 		if (recording instanceof IntervalRecording) {
-			handlerParser.postHandle(request, handler, modelAndView, (IntervalRecording<?>) recording);
+			this.handlerParser.postHandle(request, handler, modelAndView, (IntervalRecording<?>) recording);
 		}
 	}
 

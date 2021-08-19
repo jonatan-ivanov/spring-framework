@@ -16,9 +16,9 @@
 
 package org.springframework.web.servlet.mvc.observability;
 
-import org.springframework.observability.core.http.HttpServerRequest;
-import org.springframework.observability.core.http.HttpServerResponse;
-import org.springframework.observability.event.tag.Tag;
+import org.springframework.core.observability.transport.http.HttpServerRequest;
+import org.springframework.core.observability.transport.http.HttpServerResponse;
+import org.springframework.core.observability.event.tag.Tag;
 
 /**
  * Provides {@link Tag Tags} for Spring MVC-based request handling.

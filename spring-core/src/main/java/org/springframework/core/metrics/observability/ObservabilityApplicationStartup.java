@@ -20,9 +20,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.core.metrics.ApplicationStartup;
 import org.springframework.core.metrics.StartupStep;
-import org.springframework.observability.event.Recorder;
-import org.springframework.observability.event.interval.IntervalEvent;
-import org.springframework.observability.event.interval.IntervalRecording;
+import org.springframework.core.observability.event.Recorder;
+import org.springframework.core.observability.event.interval.IntervalEvent;
+import org.springframework.core.observability.event.interval.IntervalRecording;
 
 /**
  * {@link ApplicationStartup} implementation for the Spring Observability.

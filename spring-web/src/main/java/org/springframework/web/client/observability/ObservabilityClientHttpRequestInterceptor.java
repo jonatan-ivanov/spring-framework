@@ -21,16 +21,16 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.springframework.core.log.LogAccessor;
+import org.springframework.core.observability.transport.http.HttpClientRequest;
+import org.springframework.core.observability.transport.http.HttpClientResponse;
+import org.springframework.core.observability.event.Recorder;
+import org.springframework.core.observability.event.interval.IntervalHttpClientEvent;
+import org.springframework.core.observability.event.interval.IntervalRecording;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.lang.Nullable;
-import org.springframework.observability.core.http.HttpClientRequest;
-import org.springframework.observability.core.http.HttpClientResponse;
-import org.springframework.observability.event.Recorder;
-import org.springframework.observability.event.interval.IntervalHttpClientEvent;
-import org.springframework.observability.event.interval.IntervalRecording;
 import org.springframework.web.client.HttpStatusCodeException;
 
 public final class ObservabilityClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
@@ -99,33 +99,33 @@ public final class ObservabilityClientHttpRequestInterceptor implements ClientHt
 
 		@Override
 		public Object unwrap() {
-			return delegate;
+			return this.delegate;
 		}
 
 		@Override
 		public String method() {
-			return delegate.getMethod().name();
+			return this.delegate.getMethod().name();
 		}
 
 		@Override
 		public String path() {
-			return delegate.getURI().getPath();
+			return this.delegate.getURI().getPath();
 		}
 
 		@Override
 		public String url() {
-			return delegate.getURI().toString();
+			return this.delegate.getURI().toString();
 		}
 
 		@Override
 		public String header(String name) {
-			Object result = delegate.getHeaders().getFirst(name);
+			Object result = this.delegate.getHeaders().getFirst(name);
 			return result != null ? result.toString() : null;
 		}
 
 		@Override
 		public void header(String name, String value) {
-			delegate.getHeaders().set(name, value);
+			this.delegate.getHeaders().set(name, value);
 		}
 
 	}
@@ -149,7 +149,7 @@ public final class ObservabilityClientHttpRequestInterceptor implements ClientHt
 
 		@Override
 		public Object unwrap() {
-			return response;
+			return this.response;
 		}
 
 		@Override
@@ -159,20 +159,20 @@ public final class ObservabilityClientHttpRequestInterceptor implements ClientHt
 
 		@Override
 		public HttpRequestWrapper request() {
-			return request;
+			return this.request;
 		}
 
 		@Override
 		public Throwable error() {
-			return error;
+			return this.error;
 		}
 
 		@Override
 		public int statusCode() {
 			try {
-				int result = response != null ? response.getRawStatusCode() : 0;
-				if (result <= 0 && error instanceof HttpStatusCodeException) {
-					result = ((HttpStatusCodeException) error).getRawStatusCode();
+				int result = this.response != null ? this.response.getRawStatusCode() : 0;
+				if (result <= 0 && this.error instanceof HttpStatusCodeException) {
+					result = ((HttpStatusCodeException) this.error).getRawStatusCode();
 				}
 				return result;
 			}

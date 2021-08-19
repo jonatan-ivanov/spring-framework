@@ -19,10 +19,10 @@ package org.springframework.web.servlet.mvc.observability;
 import java.util.regex.Pattern;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.observability.core.http.HttpServerRequest;
-import org.springframework.observability.core.http.HttpServerResponse;
-import org.springframework.observability.event.tag.Cardinality;
-import org.springframework.observability.event.tag.Tag;
+import org.springframework.core.observability.transport.http.HttpServerRequest;
+import org.springframework.core.observability.transport.http.HttpServerResponse;
+import org.springframework.core.observability.event.tag.Cardinality;
+import org.springframework.core.observability.event.tag.Tag;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.pattern.PathPattern;
