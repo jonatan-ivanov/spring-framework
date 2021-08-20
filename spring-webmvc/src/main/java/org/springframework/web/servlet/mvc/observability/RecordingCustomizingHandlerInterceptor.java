@@ -79,7 +79,7 @@ public class RecordingCustomizingHandlerInterceptor implements HandlerIntercepto
 	}
 
 	static void setHttpRouteAttribute(HttpServletRequest request) {
-		Object httpRoute = request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
+		Object httpRoute = request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
 		// TODO: Push to a constant
 		request.setAttribute("http.route", httpRoute != null ? httpRoute.toString() : "");
 	}

@@ -22,6 +22,7 @@ import org.springframework.core.observability.event.interval.IntervalHttpServerE
 import org.springframework.core.observability.event.listener.RecordingListener;
 import org.springframework.core.observability.tracing.Tracer;
 import org.springframework.core.observability.tracing.http.HttpServerHandler;
+import org.springframework.core.observability.transport.http.HttpResponse;
 import org.springframework.core.observability.transport.http.HttpServerRequest;
 import org.springframework.core.observability.transport.http.HttpServerResponse;
 
@@ -57,9 +58,47 @@ public class HttpServerTracingRecordingListener extends
 	}
 
 	@Override
-	String getRequestMethod(IntervalEvent event) {
+	String getSpanName(IntervalEvent event) {
 		IntervalHttpServerEvent serverEvent = (IntervalHttpServerEvent) event;
+		if (serverEvent.getResponse() != null) {
+			return spanNameFromRoute(serverEvent.getResponse());
+		}
 		return serverEvent.getRequest().method();
+	}
+
+	// taken from Brave
+	private String spanNameFromRoute(HttpResponse response) {
+		int statusCode = response.statusCode();
+		String method = response.method();
+		if (method == null) {
+			return null; // don't undo a valid name elsewhere
+		}
+		String route = response.route();
+		if (route == null) {
+			return null; // don't undo a valid name elsewhere
+		}
+		if (!"".equals(route)) {
+			return method + " " + route;
+		}
+		return catchAllName(method, statusCode);
+	}
+
+	// taken from Brave
+	private String catchAllName(String method, int statusCode) {
+		switch (statusCode) {
+			// from https://tools.ietf.org/html/rfc7231#section-6.4
+			case 301:
+			case 302:
+			case 303:
+			case 305:
+			case 306:
+			case 307:
+				return method + " redirected";
+			case 404:
+				return method + " not_found";
+			default:
+				return null;
+		}
 	}
 
 	@Override

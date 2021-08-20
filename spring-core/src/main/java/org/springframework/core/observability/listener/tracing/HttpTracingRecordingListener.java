@@ -80,7 +80,7 @@ abstract class HttpTracingRecordingListener<REQ extends HttpRequest, RES extends
 	public void onStop(IntervalRecording<TracingContext> intervalRecording) {
 		Span span = intervalRecording.getContext().getSpan();
 		this.tracingTagFilter.tagSpan(span, intervalRecording.getTags());
-		span.name(getRequestMethod(intervalRecording.getEvent()));
+		span.name(getSpanName(intervalRecording.getEvent()));
 		RES response = getResponse(intervalRecording.getEvent());
 		error(response, span);
 		this.stopConsumer.accept(response, span);
@@ -92,7 +92,7 @@ abstract class HttpTracingRecordingListener<REQ extends HttpRequest, RES extends
 		// TODO: Throw an exception?
 	}
 
-	abstract String getRequestMethod(IntervalEvent event);
+	abstract String getSpanName(IntervalEvent event);
 
 	abstract RES getResponse(IntervalEvent event);
 

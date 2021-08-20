@@ -185,12 +185,14 @@ public class SimpleIntervalRecording<T> implements IntervalRecording<T> {
 
 	private void verifyIfHasStarted() {
 		if (this.started == 0) {
+			// TODO: Consider not throwing exception
 			throw new IllegalStateException("IntervalRecording hasn't been started");
 		}
 	}
 
 	private void verifyIfHasNotStopped() {
 		if (this.stopped != 0) {
+			// TODO: Consider not throwing exception
 			throw new IllegalStateException("IntervalRecording has already been stopped");
 		}
 	}

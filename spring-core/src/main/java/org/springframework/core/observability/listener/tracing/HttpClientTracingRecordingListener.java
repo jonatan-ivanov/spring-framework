@@ -57,7 +57,7 @@ public class HttpClientTracingRecordingListener extends
 	}
 
 	@Override
-	String getRequestMethod(IntervalEvent event) {
+	String getSpanName(IntervalEvent event) {
 		return getRequest(event).method();
 	}
 
