@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.springframework.core.log.LogAccessor;
 import org.springframework.core.observability.event.listener.RecordingListener;
 import org.springframework.core.observability.event.tag.Tag;
 import org.springframework.core.observability.time.Clock;
@@ -33,6 +34,8 @@ import org.springframework.core.observability.time.Clock;
  * @param <T> context type
  */
 public class SimpleIntervalRecording<T> implements IntervalRecording<T> {
+
+	private static final LogAccessor log = new LogAccessor(SimpleIntervalRecording.class);
 
 	private final IntervalEvent event;
 
@@ -110,7 +113,7 @@ public class SimpleIntervalRecording<T> implements IntervalRecording<T> {
 	@Override
 	public IntervalRecording<T> start(long wallTime, long monotonicTime) {
 		if (this.started != 0) {
-			throw new IllegalStateException("IntervalRecording has already been started");
+			log.trace(() -> "IntervalRecording has already been started");
 		}
 		this.startWallTime = wallTime;
 		this.started = monotonicTime;
@@ -164,7 +167,8 @@ public class SimpleIntervalRecording<T> implements IntervalRecording<T> {
 		verifyIfHasStarted();
 		verifyIfHasNotStopped();
 		if (this.error != null) {
-			throw new IllegalStateException("Only one error can be attached");
+			log.trace(() -> "Only one error can be attached");
+			return this;
 		}
 
 		this.error = error;
@@ -185,15 +189,13 @@ public class SimpleIntervalRecording<T> implements IntervalRecording<T> {
 
 	private void verifyIfHasStarted() {
 		if (this.started == 0) {
-			// TODO: Consider not throwing exception
-			throw new IllegalStateException("IntervalRecording hasn't been started");
+			log.trace(() -> "IntervalRecording hasn't been started");
 		}
 	}
 
 	private void verifyIfHasNotStopped() {
 		if (this.stopped != 0) {
-			// TODO: Consider not throwing exception
-			throw new IllegalStateException("IntervalRecording has already been stopped");
+			log.trace(() -> "IntervalRecording hasn't been stopped");
 		}
 	}
 
