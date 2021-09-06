@@ -56,10 +56,15 @@ abstract class HttpTracingRecordingListener<REQ extends HttpRequest, RES extends
 
 	@Override
 	public void onStart(IntervalRecording<TracingContext> intervalRecording) {
+		Span parentSpan = intervalRecording.getContext().getSpan();
+		CurrentTraceContext.Scope scope = null;
+		if (parentSpan != null) {
+			scope = this.currentTraceContext.maybeScope(parentSpan.context());
+		}
 		IntervalEvent event = intervalRecording.getEvent();
 		REQ request = getRequest(event);
 		Span span = this.startFunction.apply(request);
-		CurrentTraceContext.Scope scope = this.currentTraceContext.newScope(span.context());
+		scope = this.currentTraceContext.newScope(span.context());
 		intervalRecording.getContext().setSpanAndScope(span, scope);
 	}
 

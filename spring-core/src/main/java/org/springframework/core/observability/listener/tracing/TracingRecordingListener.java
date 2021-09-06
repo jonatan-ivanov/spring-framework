@@ -95,7 +95,6 @@ public interface TracingRecordingListener extends RecordingListener<TracingRecor
 		 *
 		 * @return span
 		 */
-		@NonNull
 		Span getSpan() {
 			return this.span;
 		}
@@ -114,7 +113,6 @@ public interface TracingRecordingListener extends RecordingListener<TracingRecor
 		 *
 		 * @return scope of the span
 		 */
-		@NonNull
 		CurrentTraceContext.Scope getScope() {
 			return this.scope;
 		}

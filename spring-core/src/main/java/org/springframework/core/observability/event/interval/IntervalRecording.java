@@ -28,7 +28,7 @@ import org.springframework.lang.Nullable;
  * @since 6.0.0
  * @param <T> context type
  */
-public interface IntervalRecording<T> extends Recording<IntervalEvent, IntervalRecording<T>> {
+public interface IntervalRecording<T> extends Recording<IntervalEvent, IntervalRecording<T>>, AutoCloseable {
 
 	/**
 	 * The duration of the event.
@@ -122,4 +122,8 @@ public interface IntervalRecording<T> extends Recording<IntervalEvent, IntervalR
 	 */
 	T getContext();
 
+	@Override
+	default void close() {
+		stop();
+	}
 }

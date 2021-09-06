@@ -49,10 +49,18 @@ public class DefaultTracingRecordingListener implements TracingRecordingListener
 	}
 
 	@Override
+	public void onCreate(IntervalRecording<TracingContext> intervalRecording) {
+		Span span = getTracer().currentSpan();
+		intervalRecording.getContext().setSpanAndScope(span, () -> { });
+	}
+
+	@Override
 	public void onStart(IntervalRecording<TracingContext> intervalRecording) {
-		Span span = this.tracer.nextSpan().name(intervalRecording.getHighCardinalityName())
+		Span parentSpan = intervalRecording.getContext().getSpan();
+		Span childSpan = parentSpan != null ? getTracer().nextSpan(parentSpan) : getTracer().nextSpan();
+		childSpan.name(intervalRecording.getHighCardinalityName())
 				.start(getStartTimeInMicros(intervalRecording));
-		setSpanAndScope(intervalRecording, span);
+		setSpanAndScope(intervalRecording, childSpan);
 	}
 
 	@Override
@@ -74,11 +82,11 @@ public class DefaultTracingRecordingListener implements TracingRecordingListener
 		this.tracingInstantRecorder.record(instantRecording);
 	}
 
-	private long getStartTimeInMicros(IntervalRecording<TracingContext> recording) {
+	long getStartTimeInMicros(IntervalRecording<TracingContext> recording) {
 		return TimeUnit.NANOSECONDS.toMicros(recording.getStartWallTime());
 	}
 
-	private long getStopTimeInMicros(IntervalRecording<TracingContext> recording) {
+	long getStopTimeInMicros(IntervalRecording<TracingContext> recording) {
 		return TimeUnit.NANOSECONDS.toMicros(recording.getStartWallTime() + recording.getDuration().toNanos());
 	}
 

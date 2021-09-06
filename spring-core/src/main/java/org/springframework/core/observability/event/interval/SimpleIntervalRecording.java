@@ -72,6 +72,7 @@ public class SimpleIntervalRecording<T> implements IntervalRecording<T> {
 		this.listener = listener;
 		this.context = listener.createContext();
 		this.clock = clock;
+		this.listener.onCreate(this);
 	}
 
 	@Override
@@ -107,6 +108,7 @@ public class SimpleIntervalRecording<T> implements IntervalRecording<T> {
 
 	@Override
 	public IntervalRecording<T> restore() {
+		this.listener.onRestore(this);
 		return this;
 	}
 
