@@ -45,7 +45,10 @@ public interface TracingRecordingListener extends RecordingListener<TracingRecor
 	 * @param intervalRecording recording with context to mutate
 	 * @param span span to put in context
 	 */
-	default void setSpanAndScope(IntervalRecording<TracingContext> intervalRecording, @NonNull Span span) {
+	default void setSpanAndScope(IntervalRecording<TracingContext> intervalRecording, Span span) {
+		if (span == null) {
+			return;
+		}
 		CurrentTraceContext.Scope scope = getTracer().currentTraceContext().maybeScope(span.context());
 		intervalRecording.getContext().setSpanAndScope(span, scope);
 	}
