@@ -18,8 +18,8 @@ package org.springframework.test.observability.tracing.test;
 
 import java.util.List;
 
-import org.springframework.core.observability.tracing.Span;
-import org.springframework.core.observability.tracing.exporter.FinishedSpan;
+import io.micrometer.core.instrument.tracing.Span;
+import io.micrometer.core.instrument.tracing.exporter.FinishedSpan;
 
 /**
  * A testing span handler that takes hold of finished spans.

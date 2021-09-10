@@ -16,10 +16,10 @@
 
 package org.springframework.test.observability.tracing.test.simple;
 
-import org.springframework.core.observability.tracing.Span;
-import org.springframework.core.observability.tracing.http.HttpServerHandler;
-import org.springframework.core.observability.transport.http.HttpServerRequest;
-import org.springframework.core.observability.transport.http.HttpServerResponse;
+import io.micrometer.core.instrument.tracing.Span;
+import io.micrometer.core.instrument.tracing.http.HttpServerHandler;
+import io.micrometer.core.instrument.transport.http.HttpServerRequest;
+import io.micrometer.core.instrument.transport.http.HttpServerResponse;
 
 /**
  * A test http server handler implementation.

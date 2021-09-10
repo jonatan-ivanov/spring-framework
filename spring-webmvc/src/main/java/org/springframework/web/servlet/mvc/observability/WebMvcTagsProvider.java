@@ -16,9 +16,10 @@
 
 package org.springframework.web.servlet.mvc.observability;
 
-import org.springframework.core.observability.transport.http.HttpServerRequest;
-import org.springframework.core.observability.transport.http.HttpServerResponse;
-import org.springframework.core.observability.event.tag.Tag;
+import io.micrometer.core.instrument.LongTaskTimer;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.transport.http.HttpServerRequest;
+import io.micrometer.core.instrument.transport.http.HttpServerResponse;
 
 /**
  * Provides {@link Tag Tags} for Spring MVC-based request handling.

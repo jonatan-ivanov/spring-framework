@@ -16,7 +16,7 @@
 
 package org.springframework.test.observability.tracing.test;
 
-import org.springframework.core.observability.tracing.exporter.FinishedSpan;
+import io.micrometer.core.instrument.tracing.exporter.FinishedSpan;
 
 /**
  * A set of most frequently used tracing assertions.

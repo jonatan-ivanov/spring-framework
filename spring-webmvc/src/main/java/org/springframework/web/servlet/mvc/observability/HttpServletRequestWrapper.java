@@ -6,8 +6,9 @@ import java.util.Collections;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 
+import io.micrometer.core.instrument.transport.http.HttpServerRequest;
+
 import org.springframework.lang.Nullable;
-import org.springframework.core.observability.transport.http.HttpServerRequest;
 
 /**
  * Wrapper around the {@link HttpServletRequest}.

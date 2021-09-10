@@ -18,11 +18,12 @@ package org.springframework.web.servlet.mvc.observability;
 
 import java.util.regex.Pattern;
 
+import io.micrometer.core.instrument.Cardinality;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.transport.http.HttpServerRequest;
+import io.micrometer.core.instrument.transport.http.HttpServerResponse;
+
 import org.springframework.http.HttpStatus;
-import org.springframework.core.observability.transport.http.HttpServerRequest;
-import org.springframework.core.observability.transport.http.HttpServerResponse;
-import org.springframework.core.observability.event.tag.Cardinality;
-import org.springframework.core.observability.event.tag.Tag;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.pattern.PathPattern;

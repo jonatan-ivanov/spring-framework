@@ -19,7 +19,9 @@ package org.springframework.web.servlet.mvc.observability;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.core.observability.event.interval.IntervalRecording;
+import io.micrometer.core.event.interval.IntervalRecording;
+import io.micrometer.core.instrument.Timer;
+
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -41,9 +43,9 @@ public final class RecordingCustomizingAsyncHandlerInterceptor implements AsyncH
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) {
-		Object recording = request.getAttribute(IntervalRecording.class.getName());
-		if (recording instanceof IntervalRecording) {
-			this.handlerParser.preHandle(request, o, (IntervalRecording<?>) recording);
+		Object recording = request.getAttribute(Timer.Sample.class.getName());
+		if (recording instanceof Timer.Sample) {
+			this.handlerParser.preHandle(request, o, (Timer.Sample) recording);
 		}
 		return true;
 	}
@@ -53,7 +55,8 @@ public final class RecordingCustomizingAsyncHandlerInterceptor implements AsyncH
 			ModelAndView modelAndView) {
 		Object recording = request.getAttribute(IntervalRecording.class.getName());
 		if (recording instanceof IntervalRecording) {
-			this.handlerParser.postHandle(request, handler, modelAndView, (IntervalRecording<?>) recording);
+			this.handlerParser.postHandle(request, handler, modelAndView,
+					(Timer.Sample) recording);
 		}
 	}
 

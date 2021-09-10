@@ -21,9 +21,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.core.observability.transport.http.HttpServerRequest;
-import org.springframework.core.observability.transport.http.HttpServerResponse;
-import org.springframework.core.observability.event.tag.Tag;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.transport.http.HttpServerRequest;
+import io.micrometer.core.instrument.transport.http.HttpServerResponse;
 
 /**
  * Default implementation of {@link WebMvcTagsProvider}.

@@ -16,10 +16,10 @@
 
 package org.springframework.aop.observability;
 
+import io.micrometer.core.instrument.tracing.Span;
+import io.micrometer.core.instrument.tracing.annotation.NewSpan;
 import org.aopalliance.intercept.MethodInvocation;
 
-import org.springframework.core.observability.tracing.Span;
-import org.springframework.core.observability.tracing.annotation.NewSpan;
 
 /**
  * Parses data for a span created via a {@link NewSpan} annotation.

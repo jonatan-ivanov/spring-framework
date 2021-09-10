@@ -19,11 +19,11 @@ package org.springframework.core.metrics.observability;
 import java.util.Collections;
 import java.util.function.Supplier;
 
+import io.micrometer.core.instrument.Cardinality;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
+
 import org.springframework.core.metrics.StartupStep;
-import org.springframework.core.observability.event.Recorder;
-import org.springframework.core.observability.event.interval.IntervalEvent;
-import org.springframework.core.observability.event.interval.IntervalRecording;
-import org.springframework.core.observability.event.tag.Cardinality;
 import org.springframework.util.StringUtils;
 
 /**
@@ -33,23 +33,14 @@ import org.springframework.util.StringUtils;
  */
 class ObservabilityStartupStep implements StartupStep {
 
-	private final IntervalRecording<?> intervalRecording;
+	private final Timer.Sample sample;
 
 	private final String name;
 
-	public ObservabilityStartupStep(String name, Recorder<?> recorder) {
-		this.intervalRecording = recorder.recordingFor(new IntervalEvent() {
-			@Override
-			public String getLowCardinalityName() {
-				return nameFromEvent(name);
-			}
-
-			@Override
-			public String getDescription() {
-				return "Interval event over [" + name + "] startup event";
-			}
-		}).tag(org.springframework.core.observability.event.tag.Tag.of("event", name, Cardinality.HIGH))
-				.start();
+	public ObservabilityStartupStep(String name, MeterRegistry meterRegistry) {
+		Timer timer = meterRegistry.timer(nameFromEvent(name), Collections.singletonList(
+				io.micrometer.core.instrument.Tag.of("event", name, Cardinality.HIGH)));
+		this.sample = timer.toSample(() -> nameFromEvent(name));
 		this.name = name;
 	}
 
@@ -100,15 +91,17 @@ class ObservabilityStartupStep implements StartupStep {
 	@Override
 	public StartupStep tag(String key, String value) {
 		if (key.equals("beanName") || key.equals("postProcessor")) {
-			this.intervalRecording.highCardinalityName(EventNameUtil.toLowerHyphen(name(value)));
+			this.sample.setHighCardinalityName(EventNameUtil.toLowerHyphen(name(value)));
 		}
-		this.intervalRecording.tag(org.springframework.core.observability.event.tag.Tag.of(EventNameUtil.toLowerHyphen(key), value, Cardinality.HIGH));
+		this.sample.tag(io.micrometer.core.instrument.Tag.of(
+				EventNameUtil.toLowerHyphen(key), value, Cardinality.HIGH));
 		return this;
 	}
 
 	@Override
 	public StartupStep tag(String key, Supplier<String> value) {
-		this.intervalRecording.tag(org.springframework.core.observability.event.tag.Tag.of(EventNameUtil.toLowerHyphen(key), value.get(), Cardinality.HIGH));
+		this.sample.tag(io.micrometer.core.instrument.Tag.of(
+				EventNameUtil.toLowerHyphen(key), value.get(), Cardinality.HIGH));
 		return this;
 	}
 
@@ -119,7 +112,7 @@ class ObservabilityStartupStep implements StartupStep {
 
 	@Override
 	public void end() {
-		this.intervalRecording.stop();
+		this.sample.stop();
 	}
 
 	static final class EventNameUtil {

@@ -16,11 +16,11 @@
 
 package org.springframework.test.observability.tracing.test.simple;
 
-import org.springframework.core.observability.tracing.Span;
-import org.springframework.core.observability.tracing.TraceContext;
-import org.springframework.core.observability.tracing.http.HttpClientHandler;
-import org.springframework.core.observability.transport.http.HttpClientRequest;
-import org.springframework.core.observability.transport.http.HttpClientResponse;
+import io.micrometer.core.instrument.tracing.Span;
+import io.micrometer.core.instrument.tracing.TraceContext;
+import io.micrometer.core.instrument.tracing.http.HttpClientHandler;
+import io.micrometer.core.instrument.transport.http.HttpClientRequest;
+import io.micrometer.core.instrument.transport.http.HttpClientResponse;
 
 /**
  * A test http client handler implementation.

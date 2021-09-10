@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.core.observability.tracing.Span;
-import org.springframework.core.observability.tracing.TraceContext;
+import io.micrometer.core.instrument.tracing.Span;
+import io.micrometer.core.instrument.tracing.TraceContext;
 
 /**
  * A test span builder implementation.

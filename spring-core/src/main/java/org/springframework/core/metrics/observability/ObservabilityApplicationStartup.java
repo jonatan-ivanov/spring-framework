@@ -18,11 +18,12 @@ package org.springframework.core.metrics.observability;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import io.micrometer.core.event.interval.IntervalEvent;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
+
 import org.springframework.core.metrics.ApplicationStartup;
 import org.springframework.core.metrics.StartupStep;
-import org.springframework.core.observability.event.Recorder;
-import org.springframework.core.observability.event.interval.IntervalEvent;
-import org.springframework.core.observability.event.interval.IntervalRecording;
 
 /**
  * {@link ApplicationStartup} implementation for the Spring Observability.
@@ -32,15 +33,16 @@ import org.springframework.core.observability.event.interval.IntervalRecording;
  */
 public class ObservabilityApplicationStartup implements ApplicationStartup {
 
-	private final Recorder<?> recorder;
+	private final MeterRegistry registry;
 
-	private final IntervalRecording<?> rootRecording;
+	private final Timer.Sample rootRecording;
 
 	private final AtomicBoolean started = new AtomicBoolean();
 
-	public ObservabilityApplicationStartup(Recorder<?> recorder) {
-		this.recorder = recorder;
-		this.rootRecording = recorder.recordingFor(new IntervalEvent() {
+	public ObservabilityApplicationStartup(MeterRegistry registry) {
+		this.registry = registry;
+		this.rootRecording = registry.timer("application-context").toSample(
+				new IntervalEvent() {
 			@Override
 			public String getLowCardinalityName() {
 				return "application-context";
@@ -59,7 +61,7 @@ public class ObservabilityApplicationStartup implements ApplicationStartup {
 			this.started.set(true);
 			this.rootRecording.start();
 		}
-		return new ObservabilityStartupStep(name, this.recorder);
+		return new ObservabilityStartupStep(name, this.registry);
 	}
 
 	public void endRootRecording() {

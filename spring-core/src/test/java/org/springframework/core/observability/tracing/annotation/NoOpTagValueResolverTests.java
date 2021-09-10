@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.core.observability.tracing.annotation;
+package io.micrometer.core.instrument.tracing.annotation;
 
 import org.junit.jupiter.api.Test;
 

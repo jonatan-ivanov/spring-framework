@@ -21,13 +21,13 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.springframework.core.observability.tracing.BaggageInScope;
-import org.springframework.core.observability.tracing.CurrentTraceContext;
-import org.springframework.core.observability.tracing.ScopedSpan;
-import org.springframework.core.observability.tracing.Span;
-import org.springframework.core.observability.tracing.SpanCustomizer;
-import org.springframework.core.observability.tracing.TraceContext;
-import org.springframework.core.observability.tracing.Tracer;
+import io.micrometer.core.instrument.tracing.BaggageInScope;
+import io.micrometer.core.instrument.tracing.CurrentTraceContext;
+import io.micrometer.core.instrument.tracing.ScopedSpan;
+import io.micrometer.core.instrument.tracing.Span;
+import io.micrometer.core.instrument.tracing.SpanCustomizer;
+import io.micrometer.core.instrument.tracing.TraceContext;
+import io.micrometer.core.instrument.tracing.Tracer;
 
 /**
  * A test tracer implementation. Puts started span in a list.

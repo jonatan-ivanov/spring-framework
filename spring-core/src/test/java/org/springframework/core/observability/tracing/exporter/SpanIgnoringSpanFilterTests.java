@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.core.observability.tracing.exporter;
+package io.micrometer.core.instrument.tracing.exporter;
 
 import java.util.Collections;
 

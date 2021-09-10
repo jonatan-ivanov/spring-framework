@@ -16,7 +16,7 @@
 
 package org.springframework.test.observability.tracing.test.simple;
 
-import org.springframework.core.observability.tracing.Tracer;
+import io.micrometer.core.instrument.tracing.Tracer;
 
 /**
  * A noop implementation. Does nothing.

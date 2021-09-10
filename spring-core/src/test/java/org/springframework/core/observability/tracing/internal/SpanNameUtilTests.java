@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.core.observability.tracing.internal;
+package io.micrometer.core.instrument.tracing.internal;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

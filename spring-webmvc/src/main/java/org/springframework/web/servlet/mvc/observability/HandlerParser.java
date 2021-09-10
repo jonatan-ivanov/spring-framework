@@ -19,7 +19,8 @@ package org.springframework.web.servlet.mvc.observability;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.core.observability.event.interval.IntervalRecording;
+import io.micrometer.core.instrument.Timer;
+
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -45,12 +46,13 @@ public class HandlerParser {
 	/** Adds no tags to the span representing the request. */
 	public static final HandlerParser NOOP = new HandlerParser() {
 		@Override
-		protected void preHandle(HttpServletRequest request, Object handler, IntervalRecording<?> customizer) {
+		protected void preHandle(HttpServletRequest request, Object handler,
+				Timer.Sample customizer) {
 		}
 
 		@Override
 		protected void postHandle(HttpServletRequest request, Object handler, ModelAndView modelAndView,
-				IntervalRecording<?> customizer) {
+				Timer.Sample customizer) {
 		}
 	};
 
@@ -65,7 +67,8 @@ public class HandlerParser {
 	 * @param handler handler
 	 * @param customizer span customizer
 	 */
-	protected void preHandle(HttpServletRequest request, Object handler, IntervalRecording<?> customizer) {
+	protected void preHandle(HttpServletRequest request, Object handler,
+			Timer.Sample customizer) {
 		if (handler instanceof HandlerMethod) {
 			HandlerMethod handlerMethod = ((HandlerMethod) handler);
 			customizer.tag(WebMvcTags.controllerClass(handlerMethod.getBeanType().getSimpleName()));
@@ -84,7 +87,7 @@ public class HandlerParser {
 	 * @param customizer span customizer
 	 */
 	protected void postHandle(HttpServletRequest request, Object handler, ModelAndView modelAndView,
-			IntervalRecording<?> customizer) {
+			Timer.Sample customizer) {
 	}
 
 }

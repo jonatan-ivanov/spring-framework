@@ -16,12 +16,12 @@
 
 package org.springframework.test.observability.tracing.test;
 
-import org.springframework.core.observability.tracing.CurrentTraceContext;
-import org.springframework.core.observability.tracing.Tracer;
-import org.springframework.core.observability.tracing.http.HttpClientHandler;
-import org.springframework.core.observability.tracing.http.HttpRequestParser;
-import org.springframework.core.observability.tracing.http.HttpServerHandler;
-import org.springframework.core.observability.tracing.propagation.Propagator;
+import io.micrometer.core.instrument.tracing.CurrentTraceContext;
+import io.micrometer.core.instrument.tracing.Tracer;
+import io.micrometer.core.instrument.tracing.http.HttpClientHandler;
+import io.micrometer.core.instrument.tracing.http.HttpRequestParser;
+import io.micrometer.core.instrument.tracing.http.HttpServerHandler;
+import io.micrometer.core.instrument.tracing.propagation.Propagator;
 
 /**
  * Abstraction that provides all the necessary tracing components.

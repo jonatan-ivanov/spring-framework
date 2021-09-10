@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package org.springframework.core.observability.tracing.docs;
+package io.micrometer.core.instrument.tracing.docs;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 
-import org.springframework.core.observability.tracing.Span;
+import io.micrometer.core.instrument.tracing.Span;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.springframework.core.observability.tracing.docs.DocumentedSpanAssertions.assertThatEventIsValid;
-import static org.springframework.core.observability.tracing.docs.DocumentedSpanAssertions.assertThatKeyIsValid;
-import static org.springframework.core.observability.tracing.docs.DocumentedSpanAssertions.assertThatNameIsValid;
-import static org.springframework.core.observability.tracing.docs.DocumentedSpanAssertions.assertThatSpanStartedBeforeEnd;
-import static org.springframework.core.observability.tracing.docs.DocumentedSpanAssertionsTests.MyEventsWithNotMatchingPrefix.A_BAR_EVENT;
-import static org.springframework.core.observability.tracing.docs.DocumentedSpanAssertionsTests.MySpan.SPAN_WITH_DYNAMIC_ENTRIES;
-import static org.springframework.core.observability.tracing.docs.DocumentedSpanAssertionsTests.MySpan.SPAN_WITH_EMPTY_TAGS_AND_EVENTS;
-import static org.springframework.core.observability.tracing.docs.DocumentedSpanAssertionsTests.MySpan.SPAN_WITH_NOT_MATCHING_PREFIX;
-import static org.springframework.core.observability.tracing.docs.DocumentedSpanAssertionsTests.MySpan.SPAN_WITH_PREFIX;
-import static org.springframework.core.observability.tracing.docs.DocumentedSpanAssertionsTests.MyTags.A_FOO_TAG;
+import static io.micrometer.core.instrument.tracing.docs.DocumentedSpanAssertions.assertThatEventIsValid;
+import static io.micrometer.core.instrument.tracing.docs.DocumentedSpanAssertions.assertThatKeyIsValid;
+import static io.micrometer.core.instrument.tracing.docs.DocumentedSpanAssertions.assertThatNameIsValid;
+import static io.micrometer.core.instrument.tracing.docs.DocumentedSpanAssertions.assertThatSpanStartedBeforeEnd;
+import static io.micrometer.core.instrument.tracing.docs.DocumentedSpanAssertionsTests.MyEventsWithNotMatchingPrefix.A_BAR_EVENT;
+import static io.micrometer.core.instrument.tracing.docs.DocumentedSpanAssertionsTests.MySpan.SPAN_WITH_DYNAMIC_ENTRIES;
+import static io.micrometer.core.instrument.tracing.docs.DocumentedSpanAssertionsTests.MySpan.SPAN_WITH_EMPTY_TAGS_AND_EVENTS;
+import static io.micrometer.core.instrument.tracing.docs.DocumentedSpanAssertionsTests.MySpan.SPAN_WITH_NOT_MATCHING_PREFIX;
+import static io.micrometer.core.instrument.tracing.docs.DocumentedSpanAssertionsTests.MySpan.SPAN_WITH_PREFIX;
+import static io.micrometer.core.instrument.tracing.docs.DocumentedSpanAssertionsTests.MyTags.A_FOO_TAG;
 
 class DocumentedSpanAssertionsTests {
 

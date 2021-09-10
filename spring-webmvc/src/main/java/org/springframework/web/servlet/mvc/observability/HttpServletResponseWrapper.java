@@ -6,8 +6,9 @@ import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.micrometer.core.instrument.transport.http.HttpServerResponse;
+
 import org.springframework.lang.Nullable;
-import org.springframework.core.observability.transport.http.HttpServerResponse;
 
 /**
  * Wrapper around the {@link HttpServletResponse}.

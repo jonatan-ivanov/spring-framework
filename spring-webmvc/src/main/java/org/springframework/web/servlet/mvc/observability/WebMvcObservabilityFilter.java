@@ -23,13 +23,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.micrometer.core.event.interval.IntervalHttpServerEvent;
+import io.micrometer.core.event.interval.IntervalRecording;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
 
-import org.springframework.core.observability.event.Recorder;
-import org.springframework.core.observability.event.interval.IntervalHttpServerEvent;
-import org.springframework.core.observability.event.interval.IntervalRecording;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.DispatcherServlet;
@@ -50,7 +51,7 @@ public class WebMvcObservabilityFilter extends OncePerRequestFilter {
 
 	private static final Log logger = LogFactory.getLog(WebMvcObservabilityFilter.class);
 
-	private final Recorder<?> recorder;
+	private final MeterRegistry meterRegistry;
 
 	private final WebMvcTagsProvider tagsProvider;
 
@@ -63,8 +64,9 @@ public class WebMvcObservabilityFilter extends OncePerRequestFilter {
 	 * @param tagsProvider the tags provider
 	 * @param metricName the metric name
 	 */
-	public WebMvcObservabilityFilter(Recorder<?> recorder, WebMvcTagsProvider tagsProvider, String metricName) {
-		this.recorder = recorder;
+	public WebMvcObservabilityFilter(MeterRegistry recorder,
+			WebMvcTagsProvider tagsProvider, String metricName) {
+		this.meterRegistry = recorder;
 		this.tagsProvider = tagsProvider;
 		this.metricName = metricName;
 	}
@@ -104,7 +106,9 @@ public class WebMvcObservabilityFilter extends OncePerRequestFilter {
 	}
 
 	private TimingContext startAndAttachTimingContext(HttpServletRequest request) {
-		IntervalRecording<?> recording = this.recorder.recordingFor(event(request)).start();
+		IntervalHttpServerEvent event = event(request);
+		Timer.Sample recording = this.meterRegistry.timer(
+				event.getLowCardinalityName()).toSample(event);
 		TimingContext timingContext = new TimingContext(recording);
 		timingContext.attachTo(request);
 		return timingContext;
@@ -142,9 +146,10 @@ public class WebMvcObservabilityFilter extends OncePerRequestFilter {
 			timingContext.getEvent().setHandler(handler);
 			HttpServletResponseWrapper responseWrapper = new HttpServletResponseWrapper(request, response, exception);
 			timingContext.getEvent().setResponse(responseWrapper);
-			IntervalRecording<?> recording = timingContext.getRecording();
-			this.tagsProvider.getTags(new HttpServletRequestWrapper(request), responseWrapper, handler, exception).forEach(recording::tag);
-			recording.stop();
+			Timer.Sample sample = timingContext.getSample();
+			this.tagsProvider.getTags(new HttpServletRequestWrapper(request),
+					responseWrapper, handler, exception).forEach(sample::tag);
+			sample.stop();
 		}
 		catch (Exception ex) {
 			logger.warn("Failed to process the recording", ex);
@@ -166,23 +171,23 @@ public class WebMvcObservabilityFilter extends OncePerRequestFilter {
 
 		private static final String RECORDING_ATTRIBUTE = IntervalRecording.class.getName();
 
-		private final IntervalRecording<?> recording;
+		private final Timer.Sample sample;
 
-		TimingContext(IntervalRecording<?> recording) {
-			this.recording = recording;
+		TimingContext(Timer.Sample recording) {
+			this.sample = recording;
 		}
 
-		IntervalRecording<?> getRecording() {
-			return this.recording;
+		Timer.Sample getSample() {
+			return this.sample;
 		}
 
 		IntervalHttpServerEvent getEvent() {
-			return (IntervalHttpServerEvent) this.recording.getEvent();
+			return (IntervalHttpServerEvent) this.sample.getEvent();
 		}
 
 		void attachTo(HttpServletRequest request) {
 			request.setAttribute(ATTRIBUTE, this);
-			request.setAttribute(RECORDING_ATTRIBUTE, this.recording);
+			request.setAttribute(RECORDING_ATTRIBUTE, this.sample);
 		}
 
 		static TimingContext get(HttpServletRequest request) {

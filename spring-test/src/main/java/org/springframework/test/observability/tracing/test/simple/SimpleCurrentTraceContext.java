@@ -20,8 +20,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
-import org.springframework.core.observability.tracing.CurrentTraceContext;
-import org.springframework.core.observability.tracing.TraceContext;
+import io.micrometer.core.instrument.tracing.CurrentTraceContext;
+import io.micrometer.core.instrument.tracing.TraceContext;
 
 /**
  * A test implementation of the current trace context.

@@ -16,7 +16,7 @@
 
 package org.springframework.test.observability.tracing.test.simple;
 
-import org.springframework.core.observability.tracing.TraceContext;
+import io.micrometer.core.instrument.tracing.TraceContext;
 
 /**
  * A noop implementation. Does nothing.

@@ -16,10 +16,10 @@
 
 package org.springframework.aop.observability;
 
+import io.micrometer.core.instrument.tracing.annotation.ContinueSpan;
+import io.micrometer.core.instrument.tracing.annotation.NewSpan;
 import org.aopalliance.intercept.MethodInvocation;
 
-import org.springframework.core.observability.tracing.annotation.ContinueSpan;
-import org.springframework.core.observability.tracing.annotation.NewSpan;
 
 /**
  * Contract for processing tracing annotations.

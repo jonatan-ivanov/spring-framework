@@ -20,12 +20,13 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
+import io.micrometer.core.event.interval.IntervalHttpClientEvent;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.transport.http.HttpClientRequest;
+import io.micrometer.core.instrument.transport.http.HttpClientResponse;
+
 import org.springframework.core.log.LogAccessor;
-import org.springframework.core.observability.transport.http.HttpClientRequest;
-import org.springframework.core.observability.transport.http.HttpClientResponse;
-import org.springframework.core.observability.event.Recorder;
-import org.springframework.core.observability.event.interval.IntervalHttpClientEvent;
-import org.springframework.core.observability.event.interval.IntervalRecording;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -37,11 +38,12 @@ public final class ObservabilityClientHttpRequestInterceptor implements ClientHt
 
 	private static final LogAccessor log = new LogAccessor(ObservabilityClientHttpRequestInterceptor.class);
 
-	private final Recorder<?> recorder;
+	private final MeterRegistry recorder;
 
 	private final ObservabilityClientHttpRequestInterceptorTagsProvider tagsProvider;
 
-	public ObservabilityClientHttpRequestInterceptor(Recorder<?> recorder, ObservabilityClientHttpRequestInterceptorTagsProvider tagsProvider) {
+	public ObservabilityClientHttpRequestInterceptor(MeterRegistry recorder,
+			ObservabilityClientHttpRequestInterceptorTagsProvider tagsProvider) {
 		this.recorder = recorder;
 		this.tagsProvider = tagsProvider;
 	}
@@ -62,7 +64,8 @@ public final class ObservabilityClientHttpRequestInterceptor implements ClientHt
 				return "Wraps an outbound RestTemplate call";
 			}
 		};
-		IntervalRecording<?> intervalRecording = this.recorder.recordingFor(intervalEvent);
+		Timer.Sample intervalRecording = this.recorder.timer(
+				intervalEvent.getLowCardinalityName()).toSample(intervalEvent);
 		intervalRecording.start();
 		log.debug(() -> "Started recording for rest template instrumentation");
 		ClientHttpResponse response = null;
