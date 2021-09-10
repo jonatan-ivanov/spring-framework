@@ -16,6 +16,11 @@
 
 package org.springframework.core.observability.event;
 
+import java.util.Deque;
+import java.util.NoSuchElementException;
+import java.util.concurrent.LinkedBlockingDeque;
+
+import org.springframework.core.log.LogAccessor;
 import org.springframework.core.observability.event.instant.InstantEvent;
 import org.springframework.core.observability.event.instant.InstantRecording;
 import org.springframework.core.observability.event.instant.NoOpInstantRecording;
@@ -36,11 +41,17 @@ import org.springframework.core.observability.time.Clock;
  */
 public class SimpleRecorder<T> implements Recorder<T> {
 
+	private static final LogAccessor log = new LogAccessor(SimpleRecorder.class);
+
 	private final RecordingListener<T> listener;
 
 	private final Clock clock;
 
 	private volatile boolean enabled;
+
+	private final ThreadLocal<IntervalRecording<T>> threadLocal = new ThreadLocal<>();
+
+	private final Deque<IntervalRecording<T>> recordings = new LinkedBlockingDeque<>();
 
 	/**
 	 * Create a new {@link SimpleRecorder}.
@@ -56,12 +67,18 @@ public class SimpleRecorder<T> implements Recorder<T> {
 
 	@Override
 	public IntervalRecording<T> recordingFor(IntervalEvent event) {
-		return this.enabled ? new SimpleIntervalRecording<>(event, this.listener, this.clock) : new NoOpIntervalRecording<>();
+		IntervalRecording<T> recording = this.enabled
+				? new SimpleIntervalRecording<>(event, this.listener, this.clock,
+						this::remove)
+				: new NoOpIntervalRecording<>();
+		setCurrentRecording(recording);
+		return recording;
 	}
 
 	@Override
 	public InstantRecording recordingFor(InstantEvent event) {
-		return this.enabled ? new SimpleInstantRecording(event, this.listener, this.clock) : new NoOpInstantRecording();
+		return this.enabled ? new SimpleInstantRecording(event, this.listener, this.clock)
+				: new NoOpInstantRecording();
 	}
 
 	@Override
@@ -74,4 +91,41 @@ public class SimpleRecorder<T> implements Recorder<T> {
 		this.enabled = enabled;
 	}
 
+	private void setCurrentRecording(IntervalRecording<T> recording) {
+		IntervalRecording<T> old = this.threadLocal.get();
+		if (old != null) {
+			log.trace(() -> "Putting previous recording to stack [" + old + "]");
+			this.recordings.addFirst(old);
+		}
+		this.threadLocal.set(recording);
+	}
+
+	/**
+	 * Returns the current interval recording.
+	 *
+	 * @return currently stored recording
+	 */
+	@Override
+	public IntervalRecording<T> getCurrentRecording() {
+		return this.threadLocal.get();
+	}
+
+	/**
+	 * Removes the current span from thread local and brings back the previous
+	 * span to the current thread local.
+	 */
+	private void remove() {
+		this.threadLocal.remove();
+		if (this.recordings.isEmpty()) {
+			return;
+		}
+		try {
+			IntervalRecording<T> first = this.recordings.removeFirst();
+			log.debug(() -> "Took recording [" + first + "] from thread local");
+			this.threadLocal.set(first);
+		}
+		catch (NoSuchElementException ex) {
+			log.trace(ex, () -> "Failed to remove a recording from the queue");
+		}
+	}
 }

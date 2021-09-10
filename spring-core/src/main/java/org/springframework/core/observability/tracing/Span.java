@@ -16,6 +16,7 @@
 
 package org.springframework.core.observability.tracing;
 
+import org.springframework.core.observability.event.interval.IntervalRecording;
 import org.springframework.core.observability.tracing.propagation.Propagator;
 
 /**
@@ -30,7 +31,7 @@ import org.springframework.core.observability.tracing.propagation.Propagator;
  * @author Marcin Grzejszczak
  * @since 6.0.0
  */
-public interface Span extends SpanCustomizer {
+public interface IntervalRecording<?> extends SpanCustomizer {
 
 	/**
 	 * Decides whether span is noop.

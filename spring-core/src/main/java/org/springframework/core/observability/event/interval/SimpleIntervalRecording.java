@@ -45,6 +45,8 @@ public class SimpleIntervalRecording<T> implements IntervalRecording<T> {
 
 	private final Clock clock;
 
+	private final Runnable closingCallback;
+
 	private final Set<Tag> tags = new LinkedHashSet<>();
 
 	private String highCardinalityName;
@@ -63,16 +65,34 @@ public class SimpleIntervalRecording<T> implements IntervalRecording<T> {
 	 * Creates a new instance of {@link SimpleIntervalRecording}.
 	 *
 	 * @param event the event this recording belongs to
-	 * @param listener the listener that needs to be notified about the recordings
+	 * @param listener the listener that needs to be notified about the
+	 * recordings
 	 * @param clock the clock to be used
+	 * @param closingCallback callback to be called upon closing of the
+	 * recording
 	 */
-	public SimpleIntervalRecording(IntervalEvent event, RecordingListener<T> listener, Clock clock) {
+	public SimpleIntervalRecording(IntervalEvent event, RecordingListener<T> listener,
+			Clock clock, Runnable closingCallback) {
 		this.event = event;
 		this.highCardinalityName = event.getLowCardinalityName();
 		this.listener = listener;
 		this.context = listener.createContext();
 		this.clock = clock;
 		this.listener.onCreate(this);
+		this.closingCallback = closingCallback;
+	}
+	
+	/**
+	 * Creates a new instance of {@link SimpleIntervalRecording}.
+	 *
+	 * @param event the event this recording belongs to
+	 * @param listener the listener that needs to be notified about the recordings
+	 * @param clock the clock to be used
+	 */
+	SimpleIntervalRecording(IntervalEvent event, RecordingListener<T> listener,
+			Clock clock) {
+		this(event, listener, clock, () -> {
+		});
 	}
 
 	@Override

@@ -20,6 +20,7 @@ import org.springframework.core.observability.event.instant.InstantEvent;
 import org.springframework.core.observability.event.instant.InstantRecording;
 import org.springframework.core.observability.event.interval.IntervalEvent;
 import org.springframework.core.observability.event.interval.IntervalRecording;
+import org.springframework.lang.Nullable;
 
 /**
  * A Recorder is basically a factory that creates {@link Recording} instances for your
@@ -61,5 +62,13 @@ public interface Recorder<T> {
 	 * @param enabled {@code true} to enable recording.
 	 */
 	void setEnabled(boolean enabled);
+
+	/**
+	 * Returns the current recording.
+	 * 
+	 * @return current recording or {@code null} when not present
+	 */
+	@Nullable
+	IntervalRecording<T> getCurrentRecording();
 
 }
