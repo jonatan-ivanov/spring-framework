@@ -19,7 +19,6 @@ package org.springframework.web.servlet.mvc.observability;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import io.micrometer.core.event.interval.IntervalRecording;
 import io.micrometer.core.instrument.Timer;
 
 import org.springframework.lang.Nullable;
@@ -49,7 +48,7 @@ public class RecordingCustomizingHandlerInterceptor implements HandlerIntercepto
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) {
 		Object recording = request.getAttribute(Timer.Sample.class.getName());
-		if (recording instanceof IntervalRecording) {
+		if (recording instanceof Timer.Sample) {
 			setHttpRouteAttribute(request);
 			this.handlerParser.preHandle(request, o, (Timer.Sample) recording);
 		}
@@ -59,8 +58,8 @@ public class RecordingCustomizingHandlerInterceptor implements HandlerIntercepto
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) {
-		Object recording = request.getAttribute(IntervalRecording.class.getName());
-		if (recording instanceof IntervalRecording) {
+		Object recording = request.getAttribute(Timer.Sample.class.getName());
+		if (recording instanceof Timer.Sample) {
 			this.handlerParser.postHandle(request, handler, modelAndView,
 					(Timer.Sample) recording);
 		}
@@ -69,8 +68,8 @@ public class RecordingCustomizingHandlerInterceptor implements HandlerIntercepto
 	@Override
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
 			Exception ex) {
-		Object recording = request.getAttribute(IntervalRecording.class.getName());
-		if (recording instanceof IntervalRecording) {
+		Object recording = request.getAttribute(Timer.Sample.class.getName());
+		if (recording instanceof Timer.Sample) {
 			setErrorAttribute(request, ex);
 		}
 	}

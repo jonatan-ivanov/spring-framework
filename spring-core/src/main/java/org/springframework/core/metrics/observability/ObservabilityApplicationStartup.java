@@ -16,9 +16,8 @@
 
 package org.springframework.core.metrics.observability;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
-import io.micrometer.core.event.interval.IntervalEvent;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 
@@ -35,37 +34,22 @@ public class ObservabilityApplicationStartup implements ApplicationStartup {
 
 	private final MeterRegistry registry;
 
-	private final Timer.Sample rootRecording;
-
-	private final AtomicBoolean started = new AtomicBoolean();
-
+	private final AtomicReference<Timer.Sample> rootSample = new AtomicReference<>();
+	
 	public ObservabilityApplicationStartup(MeterRegistry registry) {
 		this.registry = registry;
-		this.rootRecording = registry.timer("application-context").toSample(
-				new IntervalEvent() {
-			@Override
-			public String getLowCardinalityName() {
-				return "application-context";
-			}
-
-			@Override
-			public String getDescription() {
-				return "Root recording for application context instrumentation";
-			}
-		});
 	}
 
 	@Override
 	public StartupStep start(String name) {
-		if (!this.started.get()) {
-			this.started.set(true);
-			this.rootRecording.start();
+		if (this.rootSample.get() == null) {
+			this.rootSample.set(Timer.start(registry));
 		}
 		return new ObservabilityStartupStep(name, this.registry);
 	}
 
 	public void endRootRecording() {
-		this.rootRecording.stop();
+		this.rootSample.get().stop(Timer.builder("application-context").register(this.registry));
 	}
 
 }

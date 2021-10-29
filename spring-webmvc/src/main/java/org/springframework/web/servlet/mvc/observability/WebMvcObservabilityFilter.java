@@ -23,10 +23,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import io.micrometer.core.event.interval.IntervalHttpServerEvent;
-import io.micrometer.core.event.interval.IntervalRecording;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.tracing.context.IntervalHttpServerEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
@@ -107,9 +106,8 @@ public class WebMvcObservabilityFilter extends OncePerRequestFilter {
 
 	private TimingContext startAndAttachTimingContext(HttpServletRequest request) {
 		IntervalHttpServerEvent event = event(request);
-		Timer.Sample recording = this.meterRegistry.timer(
-				event.getLowCardinalityName()).toSample(event);
-		TimingContext timingContext = new TimingContext(recording);
+		Timer.Sample recording = Timer.start(meterRegistry, event);
+		TimingContext timingContext = new TimingContext(recording, event);
 		timingContext.attachTo(request);
 		return timingContext;
 	}
@@ -121,17 +119,7 @@ public class WebMvcObservabilityFilter extends OncePerRequestFilter {
 	 */
 	@NotNull
 	public IntervalHttpServerEvent event(HttpServletRequest request) {
-		return new IntervalHttpServerEvent(new HttpServletRequestWrapper(request)) {
-			@Override
-			public String getLowCardinalityName() {
-				return WebMvcObservabilityFilter.this.metricName;
-			}
-
-			@Override
-			public String getDescription() {
-				return "HTTP server recording";
-			}
-		};
+		return new IntervalHttpServerEvent(new HttpServletRequestWrapper(request));
 	}
 
 	private Throwable fetchException(HttpServletRequest request) {
@@ -147,9 +135,10 @@ public class WebMvcObservabilityFilter extends OncePerRequestFilter {
 			HttpServletResponseWrapper responseWrapper = new HttpServletResponseWrapper(request, response, exception);
 			timingContext.getEvent().setResponse(responseWrapper);
 			Timer.Sample sample = timingContext.getSample();
-			this.tagsProvider.getTags(new HttpServletRequestWrapper(request),
-					responseWrapper, handler, exception).forEach(sample::tag);
-			sample.stop();
+			sample.stop(Timer.builder(metricName)
+					.tags(this.tagsProvider.getTags(new HttpServletRequestWrapper(request),
+							responseWrapper, handler, exception))
+					.register(meterRegistry));
 		}
 		catch (Exception ex) {
 			logger.warn("Failed to process the recording", ex);
@@ -169,12 +158,17 @@ public class WebMvcObservabilityFilter extends OncePerRequestFilter {
 
 		private static final String ATTRIBUTE = TimingContext.class.getName();
 
-		private static final String RECORDING_ATTRIBUTE = IntervalRecording.class.getName();
+		private static final String RECORDING_ATTRIBUTE = Timer.Sample.class.getName();
+		
+		private static final String EVENT_ATTRIBUTE = IntervalHttpServerEvent.class.getName();
 
 		private final Timer.Sample sample;
+		
+		private final IntervalHttpServerEvent event;
 
-		TimingContext(Timer.Sample recording) {
+		TimingContext(Timer.Sample recording, IntervalHttpServerEvent event) {
 			this.sample = recording;
+			this.event = event;
 		}
 
 		Timer.Sample getSample() {
@@ -182,12 +176,13 @@ public class WebMvcObservabilityFilter extends OncePerRequestFilter {
 		}
 
 		IntervalHttpServerEvent getEvent() {
-			return (IntervalHttpServerEvent) this.sample.getEvent();
+			return this.event;
 		}
 
 		void attachTo(HttpServletRequest request) {
 			request.setAttribute(ATTRIBUTE, this);
 			request.setAttribute(RECORDING_ATTRIBUTE, this.sample);
+			request.setAttribute(EVENT_ATTRIBUTE, this.event);
 		}
 
 		static TimingContext get(HttpServletRequest request) {

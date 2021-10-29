@@ -20,9 +20,9 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
-import io.micrometer.core.event.interval.IntervalHttpClientEvent;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.tracing.context.IntervalHttpClientEvent;
 import io.micrometer.core.instrument.transport.http.HttpClientRequest;
 import io.micrometer.core.instrument.transport.http.HttpClientResponse;
 
@@ -52,21 +52,8 @@ public final class ObservabilityClientHttpRequestInterceptor implements ClientHt
 	public ClientHttpResponse intercept(HttpRequest req, byte[] body, ClientHttpRequestExecution execution)
 			throws IOException {
 		HttpRequestWrapper request = new HttpRequestWrapper(req);
-		IntervalHttpClientEvent intervalEvent = new IntervalHttpClientEvent(request) {
-
-			@Override
-			public String getLowCardinalityName() {
-				return "http.client.request";
-			}
-
-			@Override
-			public String getDescription() {
-				return "Wraps an outbound RestTemplate call";
-			}
-		};
-		Timer.Sample intervalRecording = this.recorder.timer(
-				intervalEvent.getLowCardinalityName()).toSample(intervalEvent);
-		intervalRecording.start();
+		IntervalHttpClientEvent intervalEvent = new IntervalHttpClientEvent(request);
+		Timer.Sample intervalRecording = Timer.start(this.recorder, intervalEvent);
 		log.debug(() -> "Started recording for rest template instrumentation");
 		ClientHttpResponse response = null;
 		Throwable error = null;
@@ -81,9 +68,10 @@ public final class ObservabilityClientHttpRequestInterceptor implements ClientHt
 		}
 		finally {
 			ClientHttpResponseWrapper wrapper = new ClientHttpResponseWrapper(request, response, error);
-			this.tagsProvider.getTags(request.url(), request, wrapper).forEach(intervalRecording::tag);
 			intervalEvent.setResponse(wrapper);
-			intervalRecording.stop();
+			intervalRecording.stop(Timer.builder("http.client.request")
+					.tags(this.tagsProvider.getTags(request.url(), request, wrapper))
+					.register(recorder));
 		}
 	}
 

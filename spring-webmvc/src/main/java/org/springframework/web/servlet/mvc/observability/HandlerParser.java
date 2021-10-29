@@ -35,6 +35,8 @@ import org.springframework.web.servlet.ModelAndView;
  * <p>
  * Tagging policy adopted from spring cloud sleuth 1.3.x
  */
+//TODO: IMO we will just need to mutate the request to contain attributes that later will be
+//used to tag the span
 public class HandlerParser {
 
 	/*
@@ -71,11 +73,11 @@ public class HandlerParser {
 			Timer.Sample customizer) {
 		if (handler instanceof HandlerMethod) {
 			HandlerMethod handlerMethod = ((HandlerMethod) handler);
-			customizer.tag(WebMvcTags.controllerClass(handlerMethod.getBeanType().getSimpleName()));
-			customizer.tag(WebMvcTags.controllerMethod(handlerMethod.getMethod().getName()));
+//			customizer.tag(WebMvcTags.controllerClass(handlerMethod.getBeanType().getSimpleName()));
+//			customizer.tag(WebMvcTags.controllerMethod(handlerMethod.getMethod().getName()));
 		}
 		else {
-			customizer.tag(WebMvcTags.controllerClass(handler.getClass().getSimpleName()));
+//			customizer.tag(WebMvcTags.controllerClass(handler.getClass().getSimpleName()));
 		}
 	}
 

@@ -17,7 +17,10 @@
 package org.springframework.core.metrics.observability;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import io.micrometer.core.instrument.Cardinality;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -34,14 +37,18 @@ import org.springframework.util.StringUtils;
 class ObservabilityStartupStep implements StartupStep {
 
 	private final Timer.Sample sample;
+	
+	private final MeterRegistry meterRegistry;
 
 	private final String name;
+	
+	private final Map<String, String> tags = new HashMap<>();
 
 	public ObservabilityStartupStep(String name, MeterRegistry meterRegistry) {
-		Timer timer = meterRegistry.timer(nameFromEvent(name), Collections.singletonList(
-				io.micrometer.core.instrument.Tag.of("event", name, Cardinality.HIGH)));
-		this.sample = timer.toSample(() -> nameFromEvent(name));
+		this.meterRegistry = meterRegistry;
+		this.sample = Timer.start(meterRegistry);
 		this.name = name;
+		this.tags.put("event", name);
 	}
 
 	private String nameFromEvent(String name) {
@@ -91,17 +98,16 @@ class ObservabilityStartupStep implements StartupStep {
 	@Override
 	public StartupStep tag(String key, String value) {
 		if (key.equals("beanName") || key.equals("postProcessor")) {
-			this.sample.setHighCardinalityName(EventNameUtil.toLowerHyphen(name(value)));
+//			this.sample.setHighCardinalityName(EventNameUtil.toLowerHyphen(name(value)));
+			this.tags.put("event", EventNameUtil.toLowerHyphen(name(value)));
 		}
-		this.sample.tag(io.micrometer.core.instrument.Tag.of(
-				EventNameUtil.toLowerHyphen(key), value, Cardinality.HIGH));
+		tags.put(key, value);
 		return this;
 	}
 
 	@Override
 	public StartupStep tag(String key, Supplier<String> value) {
-		this.sample.tag(io.micrometer.core.instrument.Tag.of(
-				EventNameUtil.toLowerHyphen(key), value.get(), Cardinality.HIGH));
+		tags.put(key, value.get());
 		return this;
 	}
 
@@ -112,7 +118,9 @@ class ObservabilityStartupStep implements StartupStep {
 
 	@Override
 	public void end() {
-		this.sample.stop();
+		this.sample.stop(meterRegistry.timer(nameFromEvent(name), this.tags.entrySet().stream()
+				.map(e -> io.micrometer.core.instrument.Tag.of(e.getKey(), e.getValue(), Cardinality.HIGH))
+				.collect(Collectors.toList())));
 	}
 
 	static final class EventNameUtil {

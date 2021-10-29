@@ -19,7 +19,6 @@ package org.springframework.web.servlet.mvc.observability;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import io.micrometer.core.event.interval.IntervalRecording;
 import io.micrometer.core.instrument.Timer;
 
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
@@ -33,6 +32,8 @@ import org.springframework.web.servlet.ModelAndView;
  * @author Marcin Grzejszczak
  * @since 6.0.0
  */
+// TODO: IMO we will just need to mutate the request to contain attributes that later will be
+// used to tag the span
 public final class RecordingCustomizingAsyncHandlerInterceptor implements AsyncHandlerInterceptor, HandlerInterceptor {
 
 	private final HandlerParser handlerParser;
@@ -53,8 +54,8 @@ public final class RecordingCustomizingAsyncHandlerInterceptor implements AsyncH
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) {
-		Object recording = request.getAttribute(IntervalRecording.class.getName());
-		if (recording instanceof IntervalRecording) {
+		Object recording = request.getAttribute(Timer.Sample.class.getName());
+		if (recording instanceof Timer.Sample) {
 			this.handlerParser.postHandle(request, handler, modelAndView,
 					(Timer.Sample) recording);
 		}
@@ -63,8 +64,8 @@ public final class RecordingCustomizingAsyncHandlerInterceptor implements AsyncH
 	@Override
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
 			Exception ex) {
-		Object recording = request.getAttribute(IntervalRecording.class.getName());
-		if (recording instanceof IntervalRecording) {
+		Object recording = request.getAttribute(Timer.Sample.class.getName());
+		if (recording instanceof Timer.Sample) {
 			RecordingCustomizingHandlerInterceptor.setErrorAttribute(request, ex);
 			RecordingCustomizingHandlerInterceptor.setHttpRouteAttribute(request);
 		}
