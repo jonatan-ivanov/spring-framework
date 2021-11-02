@@ -14,23 +14,12 @@
  * limitations under the License.
  */
 
-package org.springframework.test.observability.tracing.test;
-
-import io.micrometer.core.instrument.tracing.exporter.FinishedSpan;
+package org.springframework.instrument.observability.reactor;
 
 /**
- * A set of most frequently used tracing assertions.
- *
- * @author Marcin Grzejszczak
- * @since 6.0.0
+ * Only for internal use. Marker interface for Publisher and Subscriber that propagate
+ * Tracing context into execution Thread.
  */
-public interface TestTracingAssertions {
-
-	/**
-	 * Assert that the {@link FinishedSpan} has no parent.
-	 *
-	 * @param finishedSpan finished span to assert
-	 */
-	void assertThatNoParentPresent(FinishedSpan finishedSpan);
+public interface RecordingPropagator {
 
 }

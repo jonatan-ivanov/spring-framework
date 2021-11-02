@@ -26,11 +26,11 @@ dependencies {
 	optional("org.jetbrains.kotlin:kotlin-reflect")
 	optional("org.jetbrains.kotlin:kotlin-stdlib")
 	optional("org.reactivestreams:reactive-streams")
-	optional("io.micrometer:micrometer-core")
+	optional("io.projectreactor:reactor-core")
+	optional "io.micrometer:micrometer-core"
 	testCompile(testFixtures(project(":spring-aop")))
 	testCompile(testFixtures(project(":spring-beans")))
 	testCompile(testFixtures(project(":spring-core")))
-	testCompile("io.projectreactor:reactor-core")
 	testCompile("org.codehaus.groovy:groovy-jsr223")
 	testCompile("org.codehaus.groovy:groovy-test")
 	testCompile("org.codehaus.groovy:groovy-xml")
