@@ -244,6 +244,7 @@ abstract class ScheduledAnnotationReactiveSupport {
 		private void subscribe(TrackingSubscriber subscriber, Observation observation) {
 			this.subscriptionTrackerRegistry.add(subscriber);
 			if (reactorPresent) {
+				observation.start();
 				Flux.from(this.publisher)
 						.contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation))
 						.subscribe(subscriber);
@@ -300,7 +301,6 @@ abstract class ScheduledAnnotationReactiveSupport {
 		@Override
 		public void onSubscribe(Subscription subscription) {
 			this.subscription = subscription;
-			this.observation.start();
 			subscription.request(Integer.MAX_VALUE);
 		}
 
